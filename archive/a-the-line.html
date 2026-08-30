@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WorkSpace Labs — Concept A · The Line</title>
+<meta name="description" content="A human-gated build system: the AI does the work, the person keeps the decisions.">
+<style>
+/* ── Identity: Plus Jakarta Sans, bundled locally. The app never fetches fonts, and
+      neither does this page. Subsets and weight range copied from the app's own faces. */
+@font-face{font-family:'Plus Jakarta Sans';src:url('../assets/fonts/plus-jakarta-sans-var.woff2') format('woff2');font-weight:200 800;font-style:normal;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Plus Jakarta Sans';src:url('../assets/fonts/plus-jakarta-sans-ext-var.woff2') format('woff2');font-weight:200 800;font-style:normal;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
+:root{
+  --space:#F2F5FF; --panel:#FFFFFF; --rail:#FBFCFF;
+  --ink:#10182E; --ink-soft:#4A5478; --ink-faint:#8A93B2;
+  --accent:#3E5BFF; --accent-ink:#3E5BFF; --accent-2:#2F48E0; --accent-soft:rgba(62,91,255,.12);
+  --gold:#C4962E; --ok:#1EA36A; --grok:#7B4ED4;
+  --line:rgba(40,58,120,.10); --line-strong:rgba(40,58,120,.16);
+  --shadow-sm:0 8px 20px rgba(40,58,120,.07); --shadow-lg:0 16px 40px rgba(40,58,120,.10);
+  --r-lg:20px; --r-md:12px; --r-sm:9px; --r-chip:6px;
+  --gutter:clamp(20px,5vw,64px);
+  --measure:64ch;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--space); color:var(--ink);
+  font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;
+  font-size:clamp(16px,.6vw + 14.5px,18px); line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%; height:auto; display:block}
+a{color:var(--accent-ink)}
+h1,h2,h3{line-height:1.12; letter-spacing:-.02em; margin:0; font-weight:750}
+:focus-visible{outline:3px solid var(--accent-ink); outline-offset:3px; border-radius:4px}
+
+.skip{position:absolute;left:-9999px;top:0;z-index:100;background:var(--panel);color:var(--ink);
+  padding:12px 18px;border-radius:var(--r-sm);box-shadow:var(--shadow-lg);font-weight:650}
+.skip:focus{left:12px;top:12px}
+.vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ── Header ─────────────────────────────────────────────── */
+.hdr{position:sticky;top:0;z-index:50;background:rgba(242,245,255,.82);
+  backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.hdr__in{max-width:1240px;margin:0 auto;padding:12px var(--gutter);
+  display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.015em;
+  text-decoration:none;color:var(--ink);font-size:1rem;white-space:nowrap}
+.brand__dot{width:11px;height:11px;border-radius:3px;background:var(--accent);flex:none;
+  box-shadow:0 0 0 4px var(--accent-soft)}
+.nav{margin-left:auto;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.nav a{text-decoration:none;color:var(--ink-soft);font-size:.875rem;font-weight:600;
+  padding:8px 12px;border-radius:99px}
+.nav a:hover{color:var(--ink);background:var(--accent-soft)}
+.nav a:active{transform:translateY(1px)}
+/* The reserved slot: version two gets one more item here without re-cutting the header. */
+.nav__slot{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:34px;
+  border:1px dashed var(--line-strong);border-radius:99px;color:var(--ink-soft);
+  font-size:.75rem;letter-spacing:.08em;user-select:none}
+
+/* ── The line: one hairline down the page, a node per stop ─ */
+main{max-width:1240px;margin:0 auto;padding:0 var(--gutter)}
+.sec{position:relative;padding:clamp(64px,9vw,128px) 0;border-top:1px solid var(--line)}
+.sec:first-of-type{border-top:0}
+.sec__eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:18px;
+  font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.sec__eyebrow::before{content:"";width:26px;height:1px;background:var(--accent);flex:none}
+.sec h2{font-size:clamp(1.75rem,3.2vw,2.75rem);max-width:20ch}
+.lede{margin:20px 0 0;max-width:var(--measure);color:var(--ink-soft);font-size:1.0625rem}
+
+@media (min-width:1000px){
+  .sec:not(.hero){padding-left:76px}
+  .sec:not(.hero)::before{content:"";position:absolute;left:22px;top:0;bottom:0;width:1px;background:var(--line)}
+  .sec:last-of-type::before{bottom:auto;height:76px}
+  .sec:not(.hero)::after{content:"";position:absolute;left:17px;top:clamp(64px,9vw,128px);width:11px;height:11px;
+    border-radius:50%;background:var(--space);border:2px solid var(--accent)}
+}
+
+/* ── Hero ───────────────────────────────────────────────── */
+.hero{border-top:0;padding:0;background:#F4F6FF;
+  width:100vw;max-width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)}
+.hero__art{display:block;width:100%;height:auto;max-height:70vh;object-fit:cover;object-position:center}
+.hero__say{padding:clamp(28px,5vw,44px) var(--gutter) 0;max-width:1240px;margin:0 auto}
+.hero__say p{margin:0;max-width:52ch;color:var(--ink-soft);font-size:clamp(1.0625rem,1.4vw,1.25rem)}
+.hero__cta{display:inline-flex;align-items:center;gap:10px;margin-top:26px;padding:13px 22px;
+  border-radius:var(--r-sm);background:var(--accent-ink);color:#fff;text-decoration:none;
+  font-weight:700;font-size:.9375rem;box-shadow:var(--shadow-sm)}
+.hero__cta:hover{background:var(--accent-2)}
+.hero__cta:active{transform:translateY(1px)}
+.hero__cta span[aria-hidden]{transition:transform .18s ease}
+.hero__cta:hover span[aria-hidden]{transform:translateY(2px)}
+/* Phone: the landscape key art's baked wordmark would fall to ~11px, so the phone view of
+   the same artwork carries the orb alone and the page sets the words at a readable size. */
+.hero__words{display:none}
+.hero__words .fig{font-size:.6875rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent-ink)}
+.hero__words .wordmark{margin:12px 0 0;font-size:clamp(2.5rem,13vw,3.5rem);font-weight:800;letter-spacing:-.03em}
+.hero__words .wordmark em{font-style:normal;font-weight:300;color:var(--accent-ink);display:block}
+.hero__words .tag{margin:16px 0 0;font-size:.8125rem;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-soft)}
+@media (max-width:719px){
+  .hdr__in{flex-wrap:wrap;gap:8px;padding:10px var(--gutter) 8px}
+  /* The reserved + slot has to be ON the first phone screen (exam items 9 and 15). A single-row
+     scroller pushed it past the right edge at 360 and 390 CSS pixels, reachable only by an
+     un-signposted sideways drag - so the row WRAPS instead and every item stays visible. */
+  .nav{margin-left:0;width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+  .nav a{padding:7px 6px;white-space:nowrap;text-align:center}
+  .nav__slot{min-width:40px;width:auto;height:32px;justify-self:center}
+  .hero__art{height:32vh;min-height:210px;object-fit:cover;object-position:center}
+  .hero__words{display:block;padding:22px var(--gutter) 0;max-width:1240px;margin:0 auto}
+  .hero__words .wordmark{font-size:clamp(2.1rem,11vw,3rem)}
+  .hero__say{padding-top:18px}
+  .hero__say p{font-size:1rem}
+  .hero__cta{margin-top:20px}
+}
+
+/* ── Cards, stages, crew ────────────────────────────────── */
+.grid{display:grid;gap:16px;margin-top:36px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:24px;box-shadow:var(--shadow-sm)}
+.card h3{font-size:1.0625rem;font-weight:750}
+.card p{margin:10px 0 0;color:var(--ink-soft);font-size:.9375rem}
+.card__tag{display:inline-block;margin-bottom:12px;padding:4px 10px;border-radius:var(--r-chip);
+  font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--accent-soft);color:var(--accent-2)}
+
+.stages{display:flex;flex-wrap:wrap;gap:8px;margin-top:32px;padding:0;list-style:none}
+.stages li{display:flex;align-items:center;gap:8px;padding:9px 15px;border-radius:99px;
+  background:var(--panel);border:1px solid var(--line);font-size:.875rem;font-weight:650}
+.stages .gate{border-color:var(--accent);color:var(--accent-2);background:var(--accent-soft)}
+.stages .gate b{font-size:.625rem;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;padding:2px 7px;border-radius:99px;background:var(--accent-ink);color:#fff}
+
+.crew{grid-template-columns:1fr}
+@media(min-width:760px){.crew{grid-template-columns:repeat(3,1fr)}}
+.crew .card{border-top:3px solid var(--c)}
+.crew .card__tag{background:color-mix(in srgb,var(--c) 12%,transparent);color:var(--ci)}
+
+.stops{grid-template-columns:1fr}
+@media(min-width:760px){.stops{grid-template-columns:repeat(2,1fr)}}
+.stops .card{display:flex;gap:16px;align-items:flex-start}
+.stops .n{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+  background:var(--ink);color:#fff;font-size:.8125rem;font-weight:800}
+
+/* ── Windows ────────────────────────────────────────────── */
+.shots{display:grid;gap:clamp(32px,5vw,56px);margin-top:44px;grid-template-columns:1fr}
+@media(min-width:900px){.shots{grid-template-columns:repeat(2,1fr)}}
+figure{margin:0}
+figure img{border-radius:var(--r-md);border:1px solid var(--line);box-shadow:var(--shadow-lg);
+  background:var(--panel);width:100%;aspect-ratio:1536/1024}
+figcaption{margin-top:14px}
+figcaption b{display:block;font-size:1rem;font-weight:750}
+figcaption span{display:block;margin-top:5px;color:var(--ink-soft);font-size:.9375rem}
+
+/* ── Close + footer ─────────────────────────────────────── */
+.close h2{font-size:clamp(1.75rem,4vw,3rem);max-width:16ch}
+footer{border-top:1px solid var(--line);margin-top:clamp(48px,7vw,96px)}
+.foot__in{max-width:1240px;margin:0 auto;padding:32px var(--gutter);
+  display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  color:var(--ink-soft);font-size:.8125rem}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+@media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<a class="skip" href="#what">Skip to the story</a>
+
+<header class="hdr">
+  <div class="hdr__in">
+    <a class="brand" href="#top"><span class="brand__dot" aria-hidden="true"></span>WorkSpace Labs</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#what">Story</a>
+      <a href="#board">Board</a>
+      <a href="#crew">Crew</a>
+      <a href="#stops">Rules</a>
+      <a href="#windows">Windows</a>
+      <span class="nav__slot" aria-label="Reserved — a later section lands here" title="Reserved — a later section lands here">+</span>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO — the artwork is the first screen, no card around it. -->
+  <section class="sec hero" aria-labelledby="h-hero">
+    <h1 class="vh" id="h-hero">WorkSpace Labs — AI can act. Human decide.</h1>
+    <picture>
+      <source media="(max-width:719px)" srcset="../assets/orbit/orbit-phone.webp" width="1320" height="1376">
+      <img class="hero__art" src="../assets/orbit/orbit-desktop.webp" width="2048" height="1331"
+           alt="Orbital Proof — WorkSpace Labs. AI can act. Human decide. Field: human-gated. Bodies: three.">
+    </picture>
+    <div class="hero__words">
+      <p class="fig">Fig. 01 — Orbital Proof</p>
+      <p class="wordmark" aria-hidden="true">WORKSPACE<em>LABS</em></p>
+      <p class="tag">AI can act. Human decide.</p>
+    </div>
+    <div class="hero__say">
+      <p>A build system where the AI does the work and the person keeps the decisions.
+         Eight months, three agents, twenty-eight rules — and a board where nothing lands
+         without a human pressing something.</p>
+      <a class="hero__cta" href="#what">Read the journey <span aria-hidden="true">↓</span></a>
+    </div>
+  </section>
+
+  <!-- WHAT IT IS -->
+  <section class="sec" id="what" aria-labelledby="h-what">
+    <p class="sec__eyebrow">What it is</p>
+    <h2 id="h-what">An AI that can do the work, and never the deciding.</h2>
+    <p class="lede">Most AI tools ask you to trust the output. This one is built the other way round:
+      the machine is fast and tireless, so it plans, builds and checks — and every point where
+      something could be lost, changed, or shipped is a button only a person can press.</p>
+    <div class="grid" style="grid-template-columns:1fr">
+      <div class="card">
+        <span class="card__tag">The whole idea</span>
+        <h3>Speed from the machine. Judgement from the human.</h3>
+        <p>The agents write plans, write code, write the test list and read each other's work.
+           They cannot commit, cannot accept, and cannot reject. Those three are missing from
+           their tools entirely — not discouraged, not policed. Missing.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE BOARD -->
+  <section class="sec" id="board" aria-labelledby="h-board">
+    <p class="sec__eyebrow">The board</p>
+    <h2 id="h-board">Six stages, and the three that need you.</h2>
+    <p class="lede">Every piece of work is one card, and it walks the same road. The AI moves it
+      between stages. You own the three crossings marked below.</p>
+    <ul class="stages">
+      <li>Idea</li><li>Plan</li><li>Exam</li>
+      <li class="gate">Commit <b>you</b></li>
+      <li>Build</li><li>Review</li>
+      <li class="gate">Accept <b>you</b></li>
+      <li class="gate">Reject <b>you</b></li>
+    </ul>
+    <div class="shots" style="grid-template-columns:1fr;margin-top:40px">
+      <figure>
+        <img src="../assets/screens/backloop.webp" width="2304" height="1536" loading="lazy"
+             alt="The BackLoop board with six columns and one card in Active.">
+        <figcaption><b>BackLoop — the board itself</b><span>Six columns, and the card for this very site sitting in Active while an agent builds it.</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- THE CREW -->
+  <section class="sec" id="crew" aria-labelledby="h-crew">
+    <p class="sec__eyebrow">The crew</p>
+    <h2 id="h-crew">Three agents. One job each. No swapping.</h2>
+    <p class="lede">They run side by side in one session. Each has a job it may do and jobs it may
+      not — and no agent can hand itself a different one.</p>
+    <div class="grid crew">
+      <div class="card" style="--c:#7B4ED4;--ci:#63389F">
+        <span class="card__tag">Grok</span>
+        <h3>Asks, then draws</h3>
+        <p>Interrogates the idea before anyone builds — who it is for, when you need it, what the
+           unclear words mean — then designs the shapes you choose between.</p>
+      </div>
+      <div class="card" style="--c:#3E5BFF;--ci:#2F48E0">
+        <span class="card__tag">Claude</span>
+        <h3>Builds what you accepted</h3>
+        <p>Turns the accepted design into real code. Never draws the design it is going to build,
+           and never writes the test list it will be marked against.</p>
+      </div>
+      <div class="card" style="--c:#1EA36A;--ci:#1B6E4A">
+        <span class="card__tag">Codex</span>
+        <h3>Sets the exam, reads the code</h3>
+        <p>Writes what must be tried to prove the build works — before the build starts — then
+           reads the finished code and writes the problems in plain words.</p>
+      </div>
+    </div>
+    <div class="shots" style="grid-template-columns:1fr;margin-top:40px">
+      <figure>
+        <img src="../assets/screens/agents-labs.webp" width="2304" height="1536" loading="lazy"
+             alt="Agents Labs with Grok, Claude and Codex running in one live session.">
+        <figcaption><b>Agents Labs</b><span>The three agents in one live session — Grok planning, Claude building, Codex reviewing next.</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- WHAT THE RULES STOPPED -->
+  <section class="sec" id="stops" aria-labelledby="h-stops">
+    <p class="sec__eyebrow">What the rules stopped</p>
+    <h2 id="h-stops">Twenty-eight rules. Four of them earned the hard way.</h2>
+    <p class="lede">Each one exists because something went wrong once, and writing it down was
+      cheaper than it happening twice.</p>
+    <div class="grid stops">
+      <div class="card"><div class="n">1</div><div>
+        <h3>The gates are missing buttons</h3>
+        <p>Commit, Accept and Reject aren't promises an agent might forget under pressure. The
+           commands simply don't exist on the agent's side.</p></div></div>
+      <div class="card"><div class="n">2</div><div>
+        <h3>Nobody marks their own homework</h3>
+        <p>The test list is written by a different agent, before the build starts. The builder has
+           to hand it back ticked, item by item.</p></div></div>
+      <div class="card"><div class="n">3</div><div>
+        <h3>The loop cannot run forever</h3>
+        <p>A reviewer who keeps finding real problems and a builder who keeps fixing them can grind
+           for days. On the third round the board stops and asks you one question instead.</p></div></div>
+      <div class="card"><div class="n">4</div><div>
+        <h3>The builder cannot check its own work</h3>
+        <p>Reviewing is a separate lane. The agent that wrote the code is refused the command that
+           would let it sign the code off.</p></div></div>
+    </div>
+  </section>
+
+  <!-- THE WINDOWS -->
+  <section class="sec" id="windows" aria-labelledby="h-windows">
+    <p class="sec__eyebrow">The windows</p>
+    <h2 id="h-windows">The rest of the app, as it actually is.</h2>
+    <p class="lede">The board and the crew are above. Here is everything else — real captures
+      from the running app, not drawings of it.</p>
+    <div class="shots">
+      <figure><img src="../assets/screens/overview.webp" width="2304" height="1536" loading="lazy" alt="The Overview window: every project in one orbit, with the three agents and recent activity.">
+        <figcaption><b>Overview</b><span>Everything being built, in one orbit — the three agents on it, what is in flight, and what moved most recently.</span></figcaption></figure>
+      <figure><img src="../assets/screens/notes.webp" width="2304" height="1536" loading="lazy" alt="The Notes window showing one task per line and the open task’s stage-by-stage journey.">
+        <figcaption><b>Notes</b><span>One line per task. Open one and its whole journey is there — including the read-back you confirmed before anything was planned.</span></figcaption></figure>
+      <figure><img src="../assets/screens/knowledge.webp" width="2304" height="1536" loading="lazy" alt="The Knowledge window with counts for notes, skills and rules, and a fixed bug open.">
+        <figcaption><b>Knowledge</b><span>Everything that governs the AI, read-only — 210 notes, 32 skills, 28 rules, and every bug already fixed.</span></figcaption></figure>
+      <figure><img src="../assets/screens/plan.webp" width="2304" height="1536" loading="lazy" alt="The Plan window showing progress for every project roadmap.">
+        <figcaption><b>Plan</b><span>Ordered steps for every project, so the next move is never a guess.</span></figcaption></figure>
+      <figure><img src="../assets/screens/the-brief.webp" width="2304" height="1536" loading="lazy" alt="The Brief window with what needs you today above the read-only inspector cards.">
+        <figcaption><b>The Brief</b><span>What needs you today, written from the board — and the read-only inspectors you can send into a project.</span></figcaption></figure>
+      <figure><img src="../assets/screens/prompt.webp" width="2304" height="1536" loading="lazy" alt="The Prompt Generator turning a plain sentence into a finished prompt.">
+        <figcaption><b>Prompt Generator</b><span>Write what you need in your own words; leave with the exact prompt.</span></figcaption></figure>
+      <figure><img src="../assets/screens/projects.webp" width="2304" height="1536" loading="lazy" alt="The Projects window listing the live catalog with progress for each.">
+        <figcaption><b>Projects</b><span>The live catalog. A row opens that project.</span></figcaption></figure>
+    </div>
+  </section>
+
+  <!-- CLOSE -->
+  <section class="sec close" aria-labelledby="h-close">
+    <p class="sec__eyebrow">The short version</p>
+    <h2 id="h-close">The machine moved fast. Every decision stayed yours.</h2>
+    <p class="lede">That is the whole system. Everything above is the bookkeeping that makes it true
+      on a Tuesday, at round eleven, when nobody is watching.</p>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot__in">
+    <span>WorkSpace Labs</span>
+    <span>AI can act. Human decide.</span>
+  </div>
+</footer>
+</body>
+</html>

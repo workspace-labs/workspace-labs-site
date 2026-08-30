@@ -1,0 +1,5 @@
+# Never publish: rejected captures and pre-fix snapshots of the docs.
+.backup-pipeline/
+
+# macOS
+.DS_Store

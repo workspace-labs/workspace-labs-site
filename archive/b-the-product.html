@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WorkSpace Labs — Concept B · The Product</title>
+<meta name="description" content="A human-gated build system: the AI does the work, the person keeps the decisions.">
+<style>
+@font-face{font-family:'Plus Jakarta Sans';src:url('../assets/fonts/plus-jakarta-sans-var.woff2') format('woff2');font-weight:200 800;font-style:normal;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Plus Jakarta Sans';src:url('../assets/fonts/plus-jakarta-sans-ext-var.woff2') format('woff2');font-weight:200 800;font-style:normal;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
+:root{
+  --space:#F2F5FF; --panel:#FFFFFF; --ink:#10182E; --ink-soft:#4A5478; --ink-faint:#8A93B2;
+  --accent:#3E5BFF; --accent-ink:#3E5BFF; --accent-2:#2F48E0; --accent-soft:rgba(62,91,255,.12);
+  --gold:#C4962E; --ok:#1EA36A; --grok:#7B4ED4;
+  --line:rgba(40,58,120,.10); --line-strong:rgba(40,58,120,.16);
+  --shadow-sm:0 8px 20px rgba(40,58,120,.07); --shadow-lg:0 16px 40px rgba(40,58,120,.10);
+  --r-lg:20px; --r-md:12px; --r-sm:9px; --r-chip:6px;
+  --gutter:clamp(20px,5vw,64px);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--space);color:var(--ink);
+  font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;
+  font-size:clamp(16px,.6vw + 14.5px,18px);line-height:1.5;-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto;display:block}
+h1,h2,h3{line-height:1.1;letter-spacing:-.025em;margin:0;font-weight:780}
+:focus-visible{outline:3px solid var(--accent-ink);outline-offset:3px;border-radius:4px}
+.skip{position:absolute;left:-9999px;top:0;z-index:100;background:var(--panel);color:var(--ink);
+  padding:12px 18px;border-radius:var(--r-sm);box-shadow:var(--shadow-lg);font-weight:650}
+.skip:focus{left:12px;top:12px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 var(--gutter)}
+
+/* ── Header ─────────────────────────────────────────────── */
+.hdr{position:sticky;top:0;z-index:50;background:rgba(242,245,255,.86);
+  backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.hdr__in{max-width:1200px;margin:0 auto;padding:12px var(--gutter);display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.015em;
+  text-decoration:none;color:var(--ink);white-space:nowrap}
+.brand__dot{width:11px;height:11px;border-radius:3px;background:var(--accent);flex:none;
+  box-shadow:0 0 0 4px var(--accent-soft)}
+.nav{margin-left:auto;display:flex;align-items:center;gap:4px}
+.nav a{text-decoration:none;color:var(--ink-soft);font-size:.875rem;font-weight:600;padding:8px 12px;border-radius:99px}
+.nav a:hover{color:var(--ink);background:var(--accent-soft)}
+.nav a:active{transform:translateY(1px)}
+.nav__slot{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:34px;
+  border:1px dashed var(--line-strong);border-radius:99px;color:var(--ink-soft);font-size:.75rem;user-select:none}
+
+/* ── Hero: text first, product visual under it ──────────── */
+.hero{padding:clamp(56px,9vw,104px) 0 0;text-align:center}
+.hero .eyebrow{margin:0;font-size:.75rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink)}
+.hero h1{margin:20px auto 0;font-size:clamp(2.25rem,6.2vw,4.25rem);max-width:16ch}
+.hero h1 em{font-style:normal;color:var(--accent-ink)}
+.hero p.sub{margin:22px auto 0;max-width:56ch;color:var(--ink-soft);font-size:clamp(1.0625rem,1.5vw,1.25rem)}
+.btns{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:32px}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 24px;border-radius:var(--r-sm);
+  text-decoration:none;font-weight:700;font-size:.9375rem;border:1px solid transparent}
+.btn--solid{background:var(--accent-ink);color:#fff;box-shadow:var(--shadow-sm)}
+.btn--solid:hover{background:var(--accent-2)}
+.btn--ghost{background:var(--panel);color:var(--ink);border-color:var(--line-strong);box-shadow:var(--shadow-sm)}
+.btn--ghost:hover{border-color:var(--accent);color:var(--accent-ink)}
+.btn:active{transform:translateY(1px)}
+.hero__shot{margin:clamp(40px,6vw,72px) auto 0;max-width:1100px;position:relative}
+.hero__shot img{border-radius:var(--r-lg);border:1px solid var(--line);box-shadow:0 30px 70px rgba(40,58,120,.16);
+  aspect-ratio:1536/1024;background:var(--panel)}
+
+/* ── The rail ───────────────────────────────────────────────
+   Replaces a four-column stat slab. A number on its own teaches a stranger nothing — "28" means
+   nothing until you know what a rule is. This draws the road instead, with the two crossings no
+   agent can press. Phone-first: a vertical rail; from 900px it lies down and runs across.
+   Both dot sizes live in the SAME 22px box, drawn by ::before, so the plain stops and the gate
+   stops share one centre line and one baseline. Measured, not eyeballed: before this the centres
+   sat 3px apart and the names 5px apart. */
+.rail{position:relative;margin-top:clamp(44px,6vw,72px);text-align:left}
+.rail__row{list-style:none;margin:0;padding:0;display:grid;gap:24px}
+.stop{position:relative;padding-left:44px;min-height:24px;
+  display:grid;grid-template-columns:auto minmax(0,1fr);
+  grid-template-areas:"name you" "what what";column-gap:10px;align-items:baseline}
+.stop .you{grid-area:you;justify-self:start;font-size:.6875rem;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent-2);line-height:15px}
+.stop:not(.g) .you{display:none}
+.stop .dot{display:block;position:absolute;left:0;top:0;width:22px;height:22px}
+.stop .dot::before{content:"";position:absolute;inset:3px;border-radius:50%;
+  background:var(--space);border:2px solid var(--line-strong)}
+.stop.g .dot::before{inset:0;background:var(--accent-ink);border-color:var(--accent-ink);
+  box-shadow:0 0 0 5px var(--accent-soft)}
+.stop::after{content:"";position:absolute;left:10px;top:26px;bottom:-24px;width:2px;background:var(--line-strong)}
+.stop:last-child::after{display:none}
+.stop .name{display:block;grid-area:name;font-size:1rem;font-weight:750}
+.stop .what{display:block;grid-area:what;margin-top:2px;font-size:.875rem;color:var(--ink-soft)}
+.rail__foot{margin:26px 0 0;font-size:.9375rem;color:var(--ink-soft)}
+.rail__foot b{color:var(--ink);font-weight:750}
+
+@media(min-width:900px){
+  .rail{padding-top:4px}
+  .rail__row{grid-template-columns:repeat(6,1fr);gap:0;text-align:center}
+  /* 15px "you" slot + 2px gap + 11px to the dot box's centre = 28px */
+  .rail__row::before{content:"";position:absolute;left:8.3%;right:8.3%;top:28px;height:2px;
+    background:linear-gradient(90deg,var(--line-strong),var(--accent) 20%,var(--accent) 80%,var(--line-strong))}
+  .stop{display:block;padding-left:0;min-height:0}
+  .stop .you{display:block;height:15px;margin-bottom:2px}
+  .stop:not(.g) .you{display:block;visibility:hidden}
+  .stop .dot{position:relative;left:auto;top:auto;margin:0 auto}
+  .stop::after{display:none}
+  .stop .name{margin-top:12px}
+  .rail__foot{margin-top:28px;text-align:center}
+}
+
+/* ── Feature blocks: alternating text / product shot ────── */
+.feat{padding:clamp(64px,9vw,120px) 0;border-top:1px solid var(--line)}
+.feat__in{display:grid;gap:clamp(28px,4vw,56px);align-items:center}
+@media(min-width:900px){
+  .feat__in{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
+  .feat--flip .feat__in>.feat__txt{order:2}
+}
+.feat__txt .kicker{margin:0 0 16px;font-size:.75rem;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent-ink)}
+.feat__txt h2{font-size:clamp(1.625rem,3vw,2.375rem);max-width:18ch}
+.feat__txt p{margin:18px 0 0;color:var(--ink-soft);max-width:52ch}
+.feat__txt ul{margin:22px 0 0;padding:0;list-style:none;display:grid;gap:12px}
+.feat__txt li{display:flex;gap:12px;align-items:flex-start;font-size:.9375rem}
+.feat__txt li::before{content:"";flex:none;width:7px;height:7px;margin-top:8px;border-radius:2px;background:var(--accent)}
+.feat__shot img{border-radius:var(--r-md);border:1px solid var(--line);box-shadow:var(--shadow-lg);
+  aspect-ratio:1536/1024;background:var(--panel);width:100%}
+.feat__shot figcaption{margin-top:12px;font-size:.8125rem;color:var(--ink-soft)}
+figure{margin:0}
+
+/* ── Rule cards ─────────────────────────────────────────── */
+.rules{padding:clamp(64px,9vw,120px) 0;border-top:1px solid var(--line)}
+.rules__head{text-align:center;max-width:60ch;margin:0 auto}
+.rules__head h2{font-size:clamp(1.75rem,3.4vw,2.5rem)}
+.rules__head p{margin:18px 0 0;color:var(--ink-soft)}
+.cards{display:grid;gap:16px;margin-top:44px;grid-template-columns:1fr}
+@media(min-width:680px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1040px){.cards{grid-template-columns:repeat(4,1fr)}}
+.rcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:24px;
+  box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:12px}
+.rcard .n{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent-2);font-weight:800;font-size:.8125rem}
+.rcard h3{font-size:1rem;font-weight:750}
+.rcard p{margin:0;color:var(--ink-soft);font-size:.9rem}
+
+/* ── Windows gallery ────────────────────────────────────── */
+.gallery{padding:clamp(64px,9vw,120px) 0;border-top:1px solid var(--line)}
+.gallery__head{text-align:center;max-width:56ch;margin:0 auto}
+.gallery__head h2{font-size:clamp(1.75rem,3.4vw,2.5rem)}
+.gallery__head p{margin:18px 0 0;color:var(--ink-soft)}
+.gal{display:grid;gap:clamp(24px,3.5vw,40px);margin-top:48px;grid-template-columns:1fr}
+@media(min-width:760px){.gal{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1100px){.gal{grid-template-columns:repeat(3,1fr)}}
+.gal figure img{border-radius:var(--r-md);border:1px solid var(--line);box-shadow:var(--shadow-sm);
+  aspect-ratio:1536/1024;background:var(--panel);width:100%}
+.gal figcaption{margin-top:12px}
+.gal figcaption b{display:block;font-size:.9375rem;font-weight:750}
+.gal figcaption span{display:block;margin-top:4px;color:var(--ink-soft);font-size:.875rem}
+
+/* ── Closing band ───────────────────────────────────────── */
+.band{margin:clamp(56px,8vw,104px) 0 0;padding:clamp(48px,7vw,88px) var(--gutter);
+  background:var(--ink);color:#fff;text-align:center;border-radius:var(--r-lg)}
+.band h2{font-size:clamp(1.625rem,3.6vw,2.5rem);max-width:20ch;margin:0 auto}
+.band p{margin:20px auto 0;max-width:52ch;color:#C6CDE4}
+.band .btn--solid{margin-top:30px;background:#fff;color:var(--ink)}
+.band .btn--solid:hover{background:#E4E9FF}
+footer{border-top:1px solid var(--line);margin-top:clamp(48px,7vw,88px)}
+.foot__in{max-width:1200px;margin:0 auto;padding:32px var(--gutter);display:flex;flex-wrap:wrap;
+  gap:12px;align-items:center;justify-content:space-between;color:var(--ink-soft);font-size:.8125rem}
+
+@media (max-width:719px){
+  .hdr__in{flex-wrap:wrap;gap:8px;padding:10px var(--gutter) 8px}
+  /* The reserved + slot has to be ON the first phone screen (exam items 9 and 15). A single-row
+     scroller pushed it past the right edge at 360 and 390 CSS pixels, reachable only by an
+     un-signposted sideways drag - so the row WRAPS instead and every item stays visible. */
+  .nav{margin-left:0;width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+  .nav a{padding:7px 6px;white-space:nowrap;text-align:center}
+  .nav__slot{min-width:40px;width:auto;height:32px;justify-self:center}
+  .band{border-radius:var(--r-md);margin-left:calc(var(--gutter) * -1);margin-right:calc(var(--gutter) * -1)}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+@media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<a class="skip" href="#board">Skip to the story</a>
+
+<header class="hdr">
+  <div class="hdr__in">
+    <a class="brand" href="#top"><span class="brand__dot" aria-hidden="true"></span>WorkSpace Labs</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#board">The board</a>
+      <a href="#agents">The agents</a>
+      <a href="#rules">The rules</a>
+      <a href="#windows">Windows</a>
+      <span class="nav__slot" aria-label="Reserved — a later section lands here" title="Reserved — a later section lands here">+</span>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero wrap" aria-labelledby="h-hero">
+    <p class="eyebrow">AI can act. Human decide.</p>
+    <h1 id="h-hero">The AI does the work. <em>You keep every decision.</em></h1>
+    <p class="sub">A build system where three agents plan, build and check each other — and every
+      point where something could be lost, changed or shipped is a button only a person can press.</p>
+    <div class="btns">
+      <a class="btn btn--solid" href="#board">See how it works <span aria-hidden="true">→</span></a>
+      <a class="btn btn--ghost" href="#windows">Look at every screen</a>
+    </div>
+    <figure class="hero__shot">
+      <img src="../assets/screens/overview.webp" width="2304" height="1536" fetchpriority="high"
+           alt="The Overview window: every project in one orbit, with the three agents and recent activity.">
+    </figure>
+
+    <div class="rail">
+      <ol class="rail__row">
+        <li class="stop"><span class="you">&nbsp;</span><span class="dot" aria-hidden="true"></span>
+          <span class="name">Idea</span><span class="what">you drop it</span></li>
+        <li class="stop"><span class="you">&nbsp;</span><span class="dot" aria-hidden="true"></span>
+          <span class="name">Plan</span><span class="what">Grok writes it</span></li>
+        <li class="stop"><span class="you">&nbsp;</span><span class="dot" aria-hidden="true"></span>
+          <span class="name">Exam</span><span class="what">Codex sets it</span></li>
+        <li class="stop g"><span class="you">You</span><span class="dot" aria-hidden="true"></span>
+          <span class="name">Commit</span><span class="what">nothing is built first</span></li>
+        <li class="stop"><span class="you">&nbsp;</span><span class="dot" aria-hidden="true"></span>
+          <span class="name">Build</span><span class="what">Claude builds it</span></li>
+        <li class="stop g"><span class="you">You</span><span class="dot" aria-hidden="true"></span>
+          <span class="name">Accept</span><span class="what">or Reject, with a reason</span></li>
+      </ol>
+      <p class="rail__foot"><b>Six stages. Three agents. Twenty-eight rules.</b>
+        The two blue stops are the ones no agent can press.</p>
+    </div>
+  </section>
+
+  <!-- FEATURE 1 — the board -->
+  <section class="feat" id="board" aria-labelledby="h-board">
+    <div class="wrap feat__in">
+      <div class="feat__txt">
+        <p class="kicker">The board</p>
+        <h2 id="h-board">Every piece of work walks the same road.</h2>
+        <p>An idea becomes a plan, the plan gets an exam written against it, and only then can it
+          be built. The AI moves the card between stages. Three crossings are yours.</p>
+        <ul>
+          <li><b>Commit</b> — nothing is built until you press it.</li>
+          <li><b>Accept</b> — nothing is finished until you press it.</li>
+          <li><b>Reject</b> — sends it back with your reason attached.</li>
+        </ul>
+      </div>
+      <figure class="feat__shot">
+        <img src="../assets/screens/backloop.webp" width="2304" height="1536" loading="lazy"
+             alt="The BackLoop board with all six columns: Idea, Plan, Checklist, Active, Review and Complete.">
+        <figcaption>All six columns, and the card for this very site sitting in Active while an agent builds it.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- FEATURE 2 — the agents -->
+  <section class="feat feat--flip" id="agents" aria-labelledby="h-agents">
+    <div class="wrap feat__in">
+      <div class="feat__txt">
+        <p class="kicker">The three agents</p>
+        <h2 id="h-agents">One job each, and no agent may take another's.</h2>
+        <p>They run side by side in a single session, each watching the board for the work that
+          belongs to it.</p>
+        <ul>
+          <li><b>Grok</b> asks about the idea until it is clear, then draws the shapes you choose between.</li>
+          <li><b>Claude</b> builds the one you accepted — and never designs what it is about to build.</li>
+          <li><b>Codex</b> writes the exam before the build, then reads the finished code.</li>
+        </ul>
+      </div>
+      <figure class="feat__shot">
+        <img src="../assets/screens/agents-labs.webp" width="2304" height="1536" loading="lazy"
+             alt="Agents Labs with Grok, Claude and Codex running in one live session.">
+        <figcaption>The three agents in one live session — Grok planning, Claude building, Codex reviewing next.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- FEATURE 3 — knowledge -->
+  <section class="feat" aria-labelledby="h-know">
+    <div class="wrap feat__in">
+      <div class="feat__txt">
+        <p class="kicker">What it remembers</p>
+        <h2 id="h-know">Nothing gets solved twice.</h2>
+        <p>Every fixed bug and every lesson is written down where the agents have to read it before
+          they guess. The rules that govern them live in the same place, read-only.</p>
+        <ul>
+          <li>Study the log before touching a bug — not after.</li>
+          <li>A fix that teaches something general is promoted to a lesson.</li>
+          <li>The rules are visible to you, not buried in a prompt.</li>
+        </ul>
+      </div>
+      <figure class="feat__shot">
+        <img src="../assets/screens/knowledge.webp" width="2304" height="1536" loading="lazy"
+             alt="The Knowledge window with counts for notes, skills and rules, and a fixed bug open.">
+        <figcaption>Everything that governs the AI, read-only — 210 notes, 32 skills, 28 rules, and every bug already fixed.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- RULES -->
+  <section class="rules" id="rules" aria-labelledby="h-rules">
+    <div class="wrap">
+      <div class="rules__head">
+        <h2 id="h-rules">Four rules that stopped something real.</h2>
+        <p>Twenty-eight of them exist. These four each came from something going wrong once, where
+          writing it down was cheaper than it happening twice.</p>
+      </div>
+      <div class="cards">
+        <article class="rcard"><div class="n">1</div>
+          <h3>The gates are missing buttons</h3>
+          <p>Commit, Accept and Reject are not promises an agent might forget. The commands do not
+            exist on the agent's side at all.</p></article>
+        <article class="rcard"><div class="n">2</div>
+          <h3>Nobody marks their own homework</h3>
+          <p>A different agent writes the test list, before the build starts. The builder hands it
+            back ticked, item by item.</p></article>
+        <article class="rcard"><div class="n">3</div>
+          <h3>The loop cannot run forever</h3>
+          <p>On the third round of find-and-fix the board stops offering another round and asks you
+            one question instead.</p></article>
+        <article class="rcard"><div class="n">4</div>
+          <h3>The builder cannot check itself</h3>
+          <p>Reviewing is a separate lane. The agent that wrote the code is refused the command that
+            would sign it off.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- WINDOWS -->
+  <section class="gallery" id="windows" aria-labelledby="h-windows">
+    <div class="wrap">
+      <div class="gallery__head">
+        <h2 id="h-windows">The rest of the windows, as they actually are.</h2>
+        <p>Overview, the board, Agents Labs and Knowledge are above. Here is the rest — real captures
+          from the running app, not drawings of it.</p>
+      </div>
+      <div class="gal">
+        <figure><img src="../assets/screens/notes.webp" width="2304" height="1536" loading="lazy" alt="The Notes window showing one task per line and the open task’s stage-by-stage journey.">
+          <figcaption><b>Notes</b><span>One line per task. Open one and its whole journey is there — including the read-back you confirmed before anything was planned.</span></figcaption></figure>
+        <figure><img src="../assets/screens/plan.webp" width="2304" height="1536" loading="lazy" alt="The Plan window showing progress for every project roadmap.">
+          <figcaption><b>Plan</b><span>Ordered steps for every project, so the next move is never a guess.</span></figcaption></figure>
+        <figure><img src="../assets/screens/the-brief.webp" width="2304" height="1536" loading="lazy" alt="The Brief window with what needs you today above the read-only inspector cards.">
+          <figcaption><b>The Brief</b><span>What needs you today, written from the board — and the read-only inspectors you can send into a project.</span></figcaption></figure>
+        <figure><img src="../assets/screens/prompt.webp" width="2304" height="1536" loading="lazy" alt="The Prompt Generator turning a plain sentence into a finished prompt.">
+          <figcaption><b>Prompt Generator</b><span>Write what you need in your own words; leave with the exact prompt.</span></figcaption></figure>
+        <figure><img src="../assets/screens/projects.webp" width="2304" height="1536" loading="lazy" alt="The Projects window listing the live catalog with progress for each.">
+          <figcaption><b>Projects</b><span>The live catalog. A row opens that project.</span></figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING BAND -->
+  <div class="wrap">
+    <section class="band" aria-labelledby="h-band">
+      <h2 id="h-band">The machine moved fast. Every decision stayed yours.</h2>
+      <p>That is the whole system. Everything above is the bookkeeping that makes it true on a
+        Tuesday, at round eleven, when nobody is watching.</p>
+      <a class="btn btn--solid" href="#top">Back to the top <span aria-hidden="true">↑</span></a>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="foot__in">
+    <span>WorkSpace Labs</span>
+    <span>AI can act. Human decide.</span>
+  </div>
+</footer>
+</body>
+</html>

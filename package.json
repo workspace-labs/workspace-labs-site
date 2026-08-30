@@ -1,0 +1,9 @@
+{
+  "name": "workspace-labs-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The WorkSpace Labs site — one static page explaining the human-gated build system. No dependencies, no build step, no network calls.",
+  "scripts": {
+    "test": "node --test tests/journey-site.test.js"
+  }
+}
