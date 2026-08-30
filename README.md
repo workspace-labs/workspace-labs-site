@@ -38,6 +38,9 @@ archive/            the three shapes the site was chosen from, kept as the recor
 assets/screens/     nine app windows, web-sized
 assets/screens/4k/  the same nine at 4500 x 3000, so any later size is a resize
 assets/orbit/       the orbital artwork, plus the source HTML it re-renders from
+assets/logo-mark.png     the header mark — the logo trimmed and exported at 96px for a 30px slot
+assets/favicon-32.png    the browser tab icon
+assets/apple-touch-icon.png  the 180px icon for an iOS home screen
 assets/fonts/       Plus Jakarta Sans, bundled locally (SIL OFL 1.1)
 tests/              regression pins, one per defect (`npm test`)
 .backup-pipeline/   pre-edit copies of the text files, kept for rollback — text only, no pictures

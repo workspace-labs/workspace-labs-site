@@ -49,11 +49,16 @@ test('the site still opens on a picker instead of the product page', () => {
   assert.doesNotMatch(visible(src), /\bconcept\b|\bdemo\b|\bpicker\b/i,
     'the live page describes itself as a concept or a demo');
 
-  // one page: nothing on it leads to a file
-  const hrefs = [...src.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
+  // one page: no ANCHOR on it leads away. (<link> in the head is a resource, not navigation.)
+  const hrefs = [...src.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)].map(m => m[1]);
   assert.ok(hrefs.length > 0, 'the page must have links');
   for (const h of hrefs) {
     assert.ok(h.startsWith('#'), `the live page links out to a file: ${h}`);
+  }
+  // and every head resource must be a local asset that really exists
+  for (const r of [...src.matchAll(/<link\b[^>]*\bhref="([^"]+)"/g)].map(m => m[1])) {
+    assert.ok(r.startsWith('assets/'), `a head resource is not a local asset: ${r}`);
+    assert.ok(fs.existsSync(path.join(ROOT, r)), `${r} is referenced but not on disk`);
   }
   assert.doesNotMatch(src, /(archive|concepts)\//, 'the live page points at the archive');
 });
@@ -108,9 +113,10 @@ test('the window row goes back to a grid and reopens the sixth-window hole', () 
 test('the page loads its pictures from the concepts folder it no longer lives in', () => {
   const src = read(LIVE);
   const srcs = [...src.matchAll(/src="([^"]+)"/g)].map(m => m[1]);
-  assert.strictEqual(srcs.length, 9, 'nine window pictures on the page');
+  const screens = srcs.filter(s => s.startsWith('assets/screens/'));
+  assert.strictEqual(screens.length, 9, 'nine window pictures on the page');
   for (const s of srcs) {
-    assert.ok(s.startsWith('assets/screens/'), `${s} is not a root-relative site path`);
+    assert.ok(s.startsWith('assets/'), `${s} is not a root-relative site path`);
     assert.ok(fs.existsSync(path.join(ROOT, s)), `${s} is referenced but not on disk`);
   }
   for (const url of [...src.matchAll(/url\('([^']+)'\)/g)].map(m => m[1])) {

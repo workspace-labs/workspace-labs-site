@@ -63,6 +63,27 @@ uses the app's `--ok` and `--danger`.
 
 ---
 
+## The mark
+
+The header carries **his own WorkSpace Labs logo** — the four interlocking pieces, navy and teal,
+with the glow — not a generated shape and not a letterform. Added 2026-08-30 at his explicit
+request, replacing the 11px CSS square the site launched with.
+
+| | |
+|---|---|
+| File | `assets/logo-mark.png` — the 1024px original, margin trimmed, exported at 96px |
+| Rendered at | **30 x 30**, `border-radius: 8px`, a `--line` hairline and a 1px soft shadow |
+| Why 96px | a 30px slot on a retina screen needs 3x, or the detail turns to mush |
+| Tab icon | `assets/favicon-32.png` (32px) and `assets/apple-touch-icon.png` (180px) |
+
+**The artwork has no transparency** — a light ground is baked in — so the mark reads as a small
+app-icon tile rather than a floating shape. That is deliberate: it says the site is about a real
+application. Do not attempt to key the background out; the glow has no clean edge.
+
+**The honest limit, measured before it shipped:** the raw file shrunk straight to 26px reads as a
+blue-grey smudge. Five options were rendered at true size and he chose this one having seen that.
+Any future resize starts from `logo-src.png` in the app repo, never from this 96px file.
+
 ## Shape, spacing, motion
 
 - **Radius** — `20px` big surfaces · `12px` cards · `9px` buttons · `6px` chips · `99px` pills.

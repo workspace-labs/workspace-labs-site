@@ -3,6 +3,27 @@
 All notable changes to this project. The version lives in `package.json` at this code root and
 moves once per board card (Rule 27).
 
+## [1.1.0] - 2026-08-30
+
+**The brand mark is the real logo now, and the tab has an icon.** The header used to draw an
+11-pixel CSS square, and the browser tab showed the letter *W* in a grey box because the site
+carried no icon at all — every other tab in his window showed its own. Both were placeholders
+standing in for artwork that already existed.
+
+- **Header** — the CSS square is replaced by `assets/logo-mark.png`, his own four-piece mark. It
+  is the 1024px original trimmed of its empty margin and exported at 96px into a 30px slot, so it
+  is served at 3x and stays sharp on a retina screen. Shrinking the raw file straight down was
+  measured first and rejected: at 26px it reads as a smudge.
+- **Tab icon** — `assets/favicon-32.png` plus a 180px `apple-touch-icon.png` for an iOS home
+  screen, both linked from the head.
+- **Two tests were widened, and both got stronger rather than weaker.** One counted every `<img>`
+  on the page and expected exactly nine; it now counts the nine window pictures by their
+  `assets/screens/` path and checks that *every* image on the page resolves to a real file,
+  the logo included. The other read every `href` in the file and required an in-page anchor,
+  which a `<link rel="icon">` in the head is not; it now reads anchors only, and separately
+  requires each head resource to be a local asset that exists on disk. Both were re-proved to
+  still refuse a returning picker link.
+
 ## [1.0.0] - 2026-08-30
 
 *(The number stays 1.0.0 through this card's fix rounds — Rule 27 moves it once per card. The
