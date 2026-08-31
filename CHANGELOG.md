@@ -5,14 +5,18 @@ moves once per board card (Rule 27).
 
 ## [1.2.0] - 2026-08-31
 
-**The site tells search engines what it is, and stops competing with itself.** It answers at two
-addresses — `workspace-labs.net` and the `itsmk91.github.io` backup — and nothing on the page said
-which one was real, so a crawler reading both had to treat them as two sites and split the credit
-between them. It also had no `robots.txt` and no sitemap, and the three archived drafts were live
-at their own URLs with `archive/b-the-product.html` a near-copy of the homepage.
+**The site tells search engines what it is.** It had no `robots.txt` and no sitemap, so there was
+nothing to hand Google Search Console and nothing telling a crawler what to leave alone — and the
+three archived drafts were live at their own URLs, with `archive/b-the-product.html` a near-copy of
+the homepage that could surface beside it in a result.
 
 - **Canonical** — `index.html` now declares `https://workspace-labs.net/` as the one real address.
-  The backup URL still works and still serves the page; it just points the credit home.
+  Measured after shipping, and worth writing down accurately: the other addresses — `www`, plain
+  `http`, and the `itsmk91.github.io` backup — **already 301 to the domain**, which GitHub set up
+  with the CNAME on 30 August, so the canonical is not what consolidates those. What it does do is
+  collapse the URL variants a redirect never sees: a link shared with tracking parameters
+  (`?utm_source=…`) is a separate URL to a crawler, and this points every one of them at the clean
+  address. It is also the backstop if a redirect is ever lost.
 - **`robots.txt`** — invites every crawler to the site, names the sitemap by its full address, and
   turns them away from `/archive/`, so a rejected draft cannot surface in a search result beside
   the page it was rejected for.

@@ -59,13 +59,16 @@ one could be picked by eye on 30 August 2026. B was chosen and became `index.htm
 are kept so the choice is still visible; **nothing on the site links to them**, and they are not
 governed by `DESIGN.md`.
 
-**Being found in Google.** The page answers at two addresses — `workspace-labs.net` and the
-`itsmk91.github.io/workspace-labs-site/` backup. Both keep working, but a crawler reading both
-would treat them as two sites and split the credit, so `index.html` carries a **canonical** line
-naming `https://workspace-labs.net/` as the real one. `robots.txt` invites crawlers in, names the
-sitemap, and turns them away from `/archive/` — those drafts are live at their own URLs and one is
-a near-copy of the homepage, which would compete with it in a search result. `sitemap.xml` lists
-the home page and nothing else.
+**Being found in Google.** `robots.txt` invites crawlers in, names the sitemap, and turns them
+away from `/archive/` — those drafts are live at their own URLs and one is a near-copy of the
+homepage, which would compete with it in a search result. `sitemap.xml` lists the home page and
+nothing else. `index.html` carries a **canonical** line naming `https://workspace-labs.net/`.
+
+The canonical is *not* what unifies the site's addresses: `www`, plain `http` and the
+`itsmk91.github.io/workspace-labs-site/` backup all **301 to the domain already**, which GitHub
+does automatically once a CNAME and HTTPS are set. What the canonical earns is the case a redirect
+cannot see — a link shared with tracking parameters (`?utm_source=…`) is a separate URL to a
+crawler, and this points every variant at the clean address.
 
 `robots.txt` only has authority at a domain root, so it governs `workspace-labs.net`; on the
 github.io backup the crawler reads that domain's own root file instead. The canonical is what

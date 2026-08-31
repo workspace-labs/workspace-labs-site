@@ -376,9 +376,10 @@ test('the site is invisible to search engines and its two addresses compete for 
   const live = read(LIVE);
   const HOME = 'https://workspace-labs.net/';
 
-  // 1. The canonical. The page answers at the domain AND at the itsmk91.github.io backup, so
-  //    without this line a crawler treats them as two pages and splits the credit. Exactly one:
-  //    a second canonical is not twice as strong, it makes a crawler discard both.
+  // 1. The canonical. The other addresses already 301 here, so this is not what consolidates
+  //    them - it collapses the variants a redirect never sees (a shared link carrying
+  //    ?utm_source=... is a separate URL to a crawler). Exactly one: a second canonical is not
+  //    twice as strong, it makes a crawler discard both.
   const canon = [...live.matchAll(/<link\b[^>]*\brel="canonical"[^>]*>/gi)];
   assert.strictEqual(canon.length, 1, `the page must carry exactly one canonical, found ${canon.length}`);
   assert.match(canon[0][0], new RegExp(`href="${HOME}"`),
