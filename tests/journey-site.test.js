@@ -398,6 +398,28 @@ test('the site is invisible to search engines and its two addresses compete for 
   assert.ok(lines.some(l => /^disallow:\s*\/archive\/$/i.test(l)),
     'the archived drafts are crawlable and compete with the homepage');
 
+  // ...and the rule has to TAKE EFFECT, not merely be present. Two structural facts decide
+  // that, and the first version of this file got both wrong while this test still passed:
+  //   (a) the group must be CONTIGUOUS. A blank line after "User-agent: *" ends the group for
+  //       a strict first-match parser (python's own urllib.robotparser is one), orphaning
+  //       every rule beneath it - measured: the archive read as crawlable.
+  //   (b) Disallow must stand BEFORE Allow. Google picks the longest matching path whatever
+  //       the order, but a first-match parser takes whichever it reads first, and "Allow: /"
+  //       matches everything.
+  const orig = robots.split('\n').map(l => l.trim());
+  const rule = orig.map(l => l.replace(/#.*$/, '').trim());
+  const ua = rule.findIndex(l => /^user-agent:\s*\*$/i.test(l));
+  assert.ok(ua >= 0, 'robots.txt must open a group for every crawler');
+  const dis = rule.findIndex((l, i) => i > ua && /^disallow:\s*\/archive\/$/i.test(l));
+  const alw = rule.findIndex((l, i) => i > ua && /^allow:\s*\/$/i.test(l));
+  assert.ok(dis > ua && alw > ua, 'both rules must sit under the user-agent line');
+  for (let i = ua + 1; i < Math.max(dis, alw); i++) {
+    assert.notStrictEqual(orig[i], '',
+      `a blank line at robots.txt line ${i + 1} ends the group and orphans the rules below it`);
+  }
+  assert.ok(dis < alw,
+    'Disallow: /archive/ must precede Allow: / or a first-match crawler reads the archive');
+
   // 3. The sitemap has to exist, be reachable from robots.txt, and agree with the canonical.
   //    A sitemap naming one address while the canonical names another is the silent version
   //    of the very split this whole case exists to close.

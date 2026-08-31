@@ -1,11 +1,15 @@
 # workspace-labs.net — what search engines may read.
 # The site is one page; everything a reader should find is on it.
 
+# One group, no blank lines inside it: a blank line ends the group for a strict
+# first-match parser, which orphans every rule under it. Disallow stands FIRST for
+# the same reason - Google picks the longest matching path whatever the order, but
+# a first-match parser takes whichever it reads first.
 User-agent: *
-Allow: /
-
 # Early drafts of this page, kept for the record and linked from nowhere.
 # A near-copy of the homepage in search results competes with the homepage itself.
 Disallow: /archive/
+# Everything else is open.
+Allow: /
 
 Sitemap: https://workspace-labs.net/sitemap.xml
