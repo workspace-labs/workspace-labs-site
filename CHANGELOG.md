@@ -3,6 +3,32 @@
 All notable changes to this project. The version lives in `package.json` at this code root and
 moves once per board card (Rule 27).
 
+## [1.2.0] - 2026-08-31
+
+**The site tells search engines what it is, and stops competing with itself.** It answers at two
+addresses — `workspace-labs.net` and the `itsmk91.github.io` backup — and nothing on the page said
+which one was real, so a crawler reading both had to treat them as two sites and split the credit
+between them. It also had no `robots.txt` and no sitemap, and the three archived drafts were live
+at their own URLs with `archive/b-the-product.html` a near-copy of the homepage.
+
+- **Canonical** — `index.html` now declares `https://workspace-labs.net/` as the one real address.
+  The backup URL still works and still serves the page; it just points the credit home.
+- **`robots.txt`** — invites every crawler to the site, names the sitemap by its full address, and
+  turns them away from `/archive/`, so a rejected draft cannot surface in a search result beside
+  the page it was rejected for.
+- **`sitemap.xml`** — one entry, the home page, with a real `lastmod`. `changefreq` and `priority`
+  are left out on purpose: Google states it ignores both, and a file that claims what it cannot
+  deliver is worse than a short one.
+- **One test was widened, and it got stronger rather than weaker.** The head-resource pin required
+  every `<link href>` to be a local asset, which a canonical is not — it is a declaration the
+  browser never fetches. It now reads each link's `rel` and exempts only the exact single
+  `canonical`, so an outbound stylesheet, an outbound font, and a network link wearing
+  `rel="stylesheet canonical"` all still fail. All three were re-proved to fail before shipping.
+- **A new pin** holds the whole thing shut: exactly one canonical (a second makes a crawler discard
+  both), a `robots.txt` that cannot quietly become `Disallow: /`, a sitemap that agrees with the
+  canonical, and a `lastmod` that is a real date. All six of its guards were proved to bite by
+  breaking them in a disposable copy.
+
 ## [1.1.0] - 2026-08-30
 
 **The brand mark is the real logo now, and the tab has an icon.** The header used to draw an

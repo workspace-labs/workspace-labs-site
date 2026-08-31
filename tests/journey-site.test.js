@@ -55,10 +55,21 @@ test('the site still opens on a picker instead of the product page', () => {
   for (const h of hrefs) {
     assert.ok(h.startsWith('#'), `the live page links out to a file: ${h}`);
   }
-  // and every head resource must be a local asset that really exists
-  for (const r of [...src.matchAll(/<link\b[^>]*\bhref="([^"]+)"/g)].map(m => m[1])) {
-    assert.ok(r.startsWith('assets/'), `a head resource is not a local asset: ${r}`);
-    assert.ok(fs.existsSync(path.join(ROOT, r)), `${r} is referenced but not on disk`);
+  // and every head resource the BROWSER FETCHES must be a local asset that really exists.
+  // rel="canonical" is the one link that is never fetched: it declares which of the page's two
+  // addresses is the real one, so a crawler credits one page instead of splitting it. It has to
+  // be absolute to say anything at all, so it is read as a declaration and not as a resource.
+  // Every OTHER rel keeps the local-asset rule that stops this page ever reaching the network -
+  // an outbound stylesheet, font or script still fails here, and so does rel="stylesheet
+  // canonical", because only the exact single rel is a declaration.
+  for (const m of src.matchAll(/<link\b([^>]*)>/g)) {
+    const attrs = m[1];
+    const href = (attrs.match(/\bhref="([^"]+)"/) || [])[1];
+    const rel = ((attrs.match(/\brel="([^"]+)"/) || [])[1] || '').trim().toLowerCase();
+    if (!href) continue;
+    if (rel === 'canonical') continue;
+    assert.ok(href.startsWith('assets/'), `a head resource is not a local asset: ${href}`);
+    assert.ok(fs.existsSync(path.join(ROOT, href)), `${href} is referenced but not on disk`);
   }
   assert.doesNotMatch(src, /(archive|concepts)\//, 'the live page points at the archive');
 });
@@ -357,4 +368,55 @@ test('The folder described as publishable still contains the exact two known-bad
   }
   assert.doesNotMatch(read('ASSETS.md'), /kept out of\s+the tree in `\.backup-pipeline\/`/,
     'ASSETS.md still says the pair is out of the tree while it sits inside the root');
+});
+
+// ── found by search, and found ONCE ──────────────────────────────────────────
+
+test('the site is invisible to search engines and its two addresses compete for the same credit', () => {
+  const live = read(LIVE);
+  const HOME = 'https://workspace-labs.net/';
+
+  // 1. The canonical. The page answers at the domain AND at the itsmk91.github.io backup, so
+  //    without this line a crawler treats them as two pages and splits the credit. Exactly one:
+  //    a second canonical is not twice as strong, it makes a crawler discard both.
+  const canon = [...live.matchAll(/<link\b[^>]*\brel="canonical"[^>]*>/gi)];
+  assert.strictEqual(canon.length, 1, `the page must carry exactly one canonical, found ${canon.length}`);
+  assert.match(canon[0][0], new RegExp(`href="${HOME}"`),
+    `the canonical must name the live domain: ${canon[0][0]}`);
+
+  // 2. robots.txt — it must INVITE crawlers, not shut them out. A stray blanket "Disallow: /"
+  //    is the one line that would quietly delist the whole site.
+  const robots = read('robots.txt');
+  const lines = robots.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+  assert.ok(lines.some(l => /^user-agent:\s*\*$/i.test(l)), 'robots.txt must address every crawler');
+  assert.ok(!lines.some(l => /^disallow:\s*\/$/i.test(l)),
+    'robots.txt shuts every crawler out of the whole site');
+  assert.ok(lines.some(l => /^allow:\s*\/$/i.test(l)), 'robots.txt must allow the site itself');
+
+  // The rejected drafts are live at their own URLs and one is a near-copy of this page.
+  assert.ok(lines.some(l => /^disallow:\s*\/archive\/$/i.test(l)),
+    'the archived drafts are crawlable and compete with the homepage');
+
+  // 3. The sitemap has to exist, be reachable from robots.txt, and agree with the canonical.
+  //    A sitemap naming one address while the canonical names another is the silent version
+  //    of the very split this whole case exists to close.
+  assert.ok(lines.some(l => l.toLowerCase() === `sitemap: ${HOME}sitemap.xml`),
+    'robots.txt must point at the sitemap by its full address');
+
+  const sitemap = read('sitemap.xml');
+  const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1].trim());
+  assert.deepStrictEqual(locs, [HOME], `the sitemap must list the home page and nothing else: ${locs}`);
+  assert.match(sitemap, /xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9"/,
+    'the sitemap must declare the sitemaps.org namespace or Google rejects the file');
+
+  // A lastmod must be a real calendar date, not a placeholder that says "never touched".
+  const [, mod] = sitemap.match(/<lastmod>([^<]+)<\/lastmod>/) || [];
+  assert.ok(mod, 'the sitemap entry must carry a lastmod');
+  assert.match(mod, /^\d{4}-\d{2}-\d{2}$/, `lastmod must be a plain YYYY-MM-DD date: ${mod}`);
+  assert.ok(!Number.isNaN(Date.parse(mod)), `lastmod is not a real date: ${mod}`);
+
+  // 4. Nothing the sitemap invites in may be a page robots.txt turns away.
+  for (const l of locs) {
+    assert.ok(!l.includes('/archive/'), `the sitemap invites a crawler to a page robots.txt blocks: ${l}`);
+  }
 });

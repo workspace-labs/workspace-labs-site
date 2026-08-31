@@ -1,0 +1,11 @@
+# workspace-labs.net — what search engines may read.
+# The site is one page; everything a reader should find is on it.
+
+User-agent: *
+Allow: /
+
+# Early drafts of this page, kept for the record and linked from nowhere.
+# A near-copy of the homepage in search results competes with the homepage itself.
+Disallow: /archive/
+
+Sitemap: https://workspace-labs.net/sitemap.xml

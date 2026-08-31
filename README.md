@@ -42,6 +42,8 @@ assets/logo-mark.png     the header mark — the logo trimmed and exported at 96
 assets/favicon-32.png    the browser tab icon
 assets/apple-touch-icon.png  the 180px icon for an iOS home screen
 assets/fonts/       Plus Jakarta Sans, bundled locally (SIL OFL 1.1)
+robots.txt          what search engines may read — and the sitemap's address
+sitemap.xml         the one page, for Google Search Console
 tests/              regression pins, one per defect (`npm test`)
 .backup-pipeline/   pre-edit copies of the text files, kept for rollback — text only, no pictures
 ASSETS.md           where every picture came from, and how to remake it
@@ -56,6 +58,18 @@ No framework. No build step. No dependencies. No network calls.
 one could be picked by eye on 30 August 2026. B was chosen and became `index.html`. The other two
 are kept so the choice is still visible; **nothing on the site links to them**, and they are not
 governed by `DESIGN.md`.
+
+**Being found in Google.** The page answers at two addresses — `workspace-labs.net` and the
+`itsmk91.github.io/workspace-labs-site/` backup. Both keep working, but a crawler reading both
+would treat them as two sites and split the credit, so `index.html` carries a **canonical** line
+naming `https://workspace-labs.net/` as the real one. `robots.txt` invites crawlers in, names the
+sitemap, and turns them away from `/archive/` — those drafts are live at their own URLs and one is
+a near-copy of the homepage, which would compete with it in a search result. `sitemap.xml` lists
+the home page and nothing else.
+
+`robots.txt` only has authority at a domain root, so it governs `workspace-labs.net`; on the
+github.io backup the crawler reads that domain's own root file instead. The canonical is what
+covers the backup.
 
 ---
 
