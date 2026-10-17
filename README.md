@@ -4,12 +4,13 @@
 other, and every point where something could be lost, changed or shipped is a button only a person
 can press.
 
-It is a folder of static files. Nothing here is hosted, pointed at a domain, or published —
-**where it lives is a separate decision**, and this repo does not make it. The build produces
-something that can be published anywhere — and that is meant literally: every file under this
-root is either part of the page or a text record of it. **No picture that was ever rejected for
-showing a person, a machine name or a home path is kept inside this folder**, so uploading the
-whole tree cannot serve one by URL. The two rejected Agents Labs captures live outside the
+It is a folder of static files, and it is **live at https://workspace-labs.net** — published to
+GitHub Pages from `workspace-labs/workspace-labs-site`, on his own domain, over HTTPS. It still opens
+from a double-click with the network switched off, because every font and picture is a relative
+path on disk and the page makes no request of its own. Every file under this root is either part
+of the page or a text record of it. **No picture that was ever rejected for showing a person, a
+machine name or a home path is kept inside this folder**, so uploading the whole tree cannot
+serve one by URL. The two rejected Agents Labs captures live outside the
 project, in the catalog at
 `~/Desktop/Workspace/workspace-labs-website/.backup-pipeline/leaked-captures-20260830/`.
 
@@ -41,6 +42,8 @@ assets/orbit/       the orbital artwork, plus the source HTML it re-renders from
 assets/logo-mark.png     the header mark — the logo trimmed and exported at 96px for a 30px slot
 assets/favicon-32.png    the browser tab icon
 assets/apple-touch-icon.png  the 180px icon for an iOS home screen
+assets/og-card.png       the picture a shared link paints (2400 x 1260)
+assets/og-card.source.html   the HTML that card is remade from
 assets/fonts/       Plus Jakarta Sans, bundled locally (SIL OFL 1.1)
 robots.txt          what search engines may read — and the sitemap's address
 sitemap.xml         the one page, for Google Search Console
@@ -65,7 +68,7 @@ homepage, which would compete with it in a search result. `sitemap.xml` lists th
 nothing else. `index.html` carries a **canonical** line naming `https://workspace-labs.net/`.
 
 The canonical is *not* what unifies the site's addresses: `www`, plain `http` and the
-`itsmk91.github.io/workspace-labs-site/` backup all **301 to the domain already**, which GitHub
+`workspace-labs.github.io/workspace-labs-site/` backup all **301 to the domain already**, which GitHub
 does automatically once a CNAME and HTTPS are set. What the canonical earns is the case a redirect
 cannot see — a link shared with tracking parameters (`?utm_source=…`) is a separate URL to a
 crawler, and this points every variant at the clean address.
@@ -171,9 +174,66 @@ the full trace.
 
 ---
 
+## Reaching him, and what a shared link shows
+
+The footer carries **three quiet handles**, under the two sentences that were always there:
+
+| Reads | Goes to |
+|---|---|
+| `github.com/workspace-labs` | `https://github.com/workspace-labs` |
+| `@workspacelabs91` | `https://x.com/workspacelabs91` |
+| `workspacelabs91@gmail.com` | `mailto:workspacelabs91@gmail.com` |
+
+Text only — no GitHub or X marks, and no word-label standing in for a handle. Each opens a new
+tab with `rel="noopener noreferrer"`, so the page it opens gets no handle back on this one. They
+**wrap**: at 360 CSS px they sit on two rows with nothing past the edge. Hover and keyboard focus
+both **underline**, so the link is not signalled by colour alone.
+
+**The link preview.** `assets/og-card.png` (2400 × 1260) is the picture X, LinkedIn, iMessage and
+Slack paint when the address is shared — the headline and the mark beside the Overview window, on
+the site's own daylight ground. It is built from the site's own font, mark and screenshot, so it
+cannot drift from the page; `assets/og-card.source.html` remakes it and `ASSETS.md` carries the
+command. The head declares it **absolutely** (`https://workspace-labs.net/assets/og-card.png`) —
+a crawler has no page to resolve a relative path against — with the width and height that match
+the real file, and `twitter:card: summary_large_image` so X paints it wide rather than as a
+thumbnail.
+
+Checked in a real browser at 1440, 768 and 360 px: all three links open a new page and leave the
+site standing, the keyboard reaches them and the 3 px focus ring shows, every hit area is at
+least 24 × 24 px, nothing paints past the viewport edge, and the handles measure 4.65:1 against
+the ground.
+
+---
+
 ## Not in here
 
 No login. No dashboard. No live data. No CMS. The app is not embedded and no app source is
-published. No download, no pricing, no install instructions, no waitlist, no email address, no
-analytics, no favicon, no social cards. Hosting and a domain are a separate decision, and not one
-this repo makes.
+published. No download, no pricing, no install instructions and no waitlist. **No contact form,
+no newsletter, no analytics, and nothing that sends a visitor's details anywhere** — the footer's
+three handles are ordinary links a reader chooses to follow, and the page still makes zero
+network requests of its own.
+
+**No LinkedIn, and no real name anywhere on the page or one click from it.** The site is
+handle-only by decision: `github.com/workspace-labs`, `@workspacelabs91`, and the brand inbox
+`workspacelabs91@gmail.com`. **Three** regression pins hold that shut — one names the three
+permitted addresses one at a time, the second refuses any other `@handle` in visible copy and any
+linkedin.com or twitter.com address in the source, and the third refuses **the name itself**.
+
+That third one was added after a reviewer showed the first two were not enough: refusing a
+LinkedIn *address* does not refuse a *name*, so the name could be typed straight into the footer
+with the suite still green. Because this repo **is** the public site, the pin could not simply
+spell the name out — that would have been the leak it guards against. It holds the name as salted
+digests of its parts instead, hashes every run of letters the page could spell a name with, and
+refuses a match; it reads the visible copy *and* the whole source, since an HTML comment is served
+to every visitor too. Nothing readable is stored, and regenerating the digests takes the parts on
+the command line and keeps none of them.
+
+Its limit is written in the test beside it, so nobody trusts it further than it goes: a name
+carries too little entropy for any published check to survive a determined dictionary attack by
+someone who already suspects the exact name — no slow hash fixes that, so none is pretended. What
+it does buy is complete: the name is not in the repo, not in a grep, not in GitHub search, not in
+a search engine, and an accidental re-introduction fails the suite the moment it lands.
+
+*(Three lines used to sit here that are no longer true, and are corrected rather than deleted so
+the record reads straight: the tab icon shipped in v1.1.0, the brand inbox and the social card
+ship in v1.3.0, and the site has been hosted on its own domain since 30 August 2026.)*

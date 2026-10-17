@@ -10,11 +10,21 @@
 const test   = require('node:test');
 const assert = require('node:assert');
 const fs     = require('node:fs');
+const crypto = require('node:crypto');
 const path   = require('node:path');
 
 const ROOT  = path.join(__dirname, '..');
 const read  = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
 const LIVE  = 'index.html';
+
+// The only three addresses this page may point at, in the order he answered them on
+// t-1788110064810 (2026-08-30): GitHub, X, the brand inbox. Written out in full on purpose - a
+// host pattern would quietly admit a second account or a different repo.
+const OUTBOUND = [
+  'https://github.com/workspace-labs',
+  'https://x.com/workspacelabs91',
+  'mailto:workspacelabs91@gmail.com',
+];
 
 // visible copy = what a reader sees: no comments, no stylesheet, no tag names
 const visible = src => src
@@ -49,12 +59,19 @@ test('the site still opens on a picker instead of the product page', () => {
   assert.doesNotMatch(visible(src), /\bconcept\b|\bdemo\b|\bpicker\b/i,
     'the live page describes itself as a concept or a demo');
 
-  // one page: no ANCHOR on it leads away. (<link> in the head is a resource, not navigation.)
+  // one page: no ANCHOR on it leads to another FILE. (<link> in the head is a resource, not
+  // navigation.) Since v1.3.0 the footer carries exactly three outbound handles - the ones he
+  // answered on the card - and they are named here one address at a time rather than by a host
+  // pattern, so a fourth link, a different account, or twitter.com still fails this pin.
   const hrefs = [...src.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)].map(m => m[1]);
   assert.ok(hrefs.length > 0, 'the page must have links');
   for (const h of hrefs) {
-    assert.ok(h.startsWith('#'), `the live page links out to a file: ${h}`);
+    assert.ok(h.startsWith('#') || OUTBOUND.includes(h),
+      `the live page links out to a file: ${h}`);
   }
+  // and no outbound address may appear twice or go missing - three links, three destinations
+  const out = hrefs.filter(h => !h.startsWith('#'));
+  assert.deepStrictEqual(out, OUTBOUND, 'the footer must carry exactly the three approved links, in order');
   // and every head resource the BROWSER FETCHES must be a local asset that really exists.
   // rel="canonical" is the one link that is never fetched: it declares which of the page's two
   // addresses is the real one, so a crawler credits one page instead of splitting it. It has to
@@ -191,8 +208,18 @@ test("the visible copy breaks the human's version-one content decision", () => {
                       'published', 'unavailable', 'closed', 'private']) {
     assert.doesNotMatch(text, new RegExp('\\b' + word, 'i'), `the site says "${word}" in visible copy`);
   }
-  // WorkSpace Labs only — no person, no handle
-  assert.doesNotMatch(text, /@[a-z0-9_]{3,}/i, 'a handle appeared in visible copy');
+  // WorkSpace Labs only — no person. The brand's OWN two handles are the only ones allowed
+  // (his answer on t-1788110064810: handle-only, never the real name), so they are removed
+  // before the ban runs and every OTHER @handle still fails exactly as it did.
+  const stripped = text
+    .split('@workspacelabs91').join('')
+    .split('workspacelabs91@gmail.com').join('');
+  assert.doesNotMatch(stripped, /@[a-z0-9_]{3,}/i, 'a handle appeared in visible copy');
+  assert.doesNotMatch(text, /linkedin/i, 'LinkedIn appeared in visible copy');
+  // A URL, not the word: naming LinkedIn in a comment about who reads the og tags is honest
+  // documentation; an ADDRESS on either host is the thing that must never appear.
+  assert.doesNotMatch(read(LIVE), /(?:https?:)?\/\/(?:[a-z0-9-]+\.)*(?:linkedin\.com|twitter\.com)/i,
+    'a linkedin.com or twitter.com address is in the page source');
   assert.doesNotMatch(read(LIVE), /\/Users\//, 'a home path appeared in the page source');
 });
 
@@ -441,5 +468,188 @@ test('the site is invisible to search engines and its two addresses compete for 
   // 4. Nothing the sitemap invites in may be a page robots.txt turns away.
   for (const l of locs) {
     assert.ok(!l.includes('/archive/'), `the sitemap invites a crawler to a page robots.txt blocks: ${l}`);
+  }
+});
+
+// ── the footer's three handles, and the picture a shared link paints ──────────
+
+test('the footer loses a handle, points somewhere else, or hands the tab to the site it opens', () => {
+  const src = read(LIVE);
+  const HOME = 'https://workspace-labs.net/';
+
+  // The two sentences that were already there must survive untouched. He asked for links UNDER
+  // the existing line, not instead of it.
+  assert.match(src, /<span>WorkSpace Labs<\/span>/, 'the footer lost its brand line');
+  assert.match(src, /<span>AI can act\. Human decide\.<\/span>/, 'the footer lost the tagline');
+
+  // Exactly three anchors, in a labelled nav, in his order, each with its visible handle.
+  const nav = /<nav class="foot__links"([\s\S]*?)<\/nav>/.exec(src);
+  assert.ok(nav, 'the footer must carry the handle nav');
+  assert.match(nav[0], /aria-label="[^"]+"/, 'the footer nav needs a label, or a screen reader hears two unnamed navs');
+
+  const links = [...nav[1].matchAll(/<a\b([^>]*)>([^<]*)<\/a>/g)]
+    .map(m => ({ attrs: m[1], text: m[2].trim() }));
+  assert.strictEqual(links.length, 3, `the footer must carry exactly three links, found ${links.length}`);
+
+  const want = [
+    ['https://github.com/workspace-labs', 'github.com/workspace-labs'],
+    ['https://x.com/workspacelabs91',     '@workspacelabs91'],
+    ['mailto:workspacelabs91@gmail.com',  'workspacelabs91@gmail.com'],
+  ];
+  links.forEach((a, i) => {
+    const [href, text] = want[i];
+    assert.match(a.attrs, new RegExp(`href="${href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`),
+      `footer link ${i + 1} must point at ${href}`);
+    assert.strictEqual(a.text, text, `footer link ${i + 1} must read as its handle, not a label`);
+    // A new tab, and the opened page must not get a handle back on this one.
+    assert.match(a.attrs, /target="_blank"/, `footer link ${i + 1} must open in a new tab`);
+    assert.match(a.attrs, /rel="noopener noreferrer"/,
+      `footer link ${i + 1} must carry rel="noopener noreferrer"`);
+  });
+  // The handles are the whole point: no icon, no word-label standing in for them.
+  // No marks. (No word-LABEL is already proved above: each link's text must equal its handle
+  // exactly, so "GitHub" cannot stand in for github.com/workspace-labs.)
+  assert.doesNotMatch(nav[0], /<svg|<img|<picture|<i\b/i,
+    'the footer links must be quiet handle text - no GitHub or X marks');
+
+  // Identity: the brand, never the person. A LinkedIn ADDRESS is what must never appear -
+  // he asked for handle-only, and his LinkedIn carries his real name. (The visible-copy pin
+  // separately refuses the word itself anywhere a reader can see it.)
+  assert.doesNotMatch(src, /(?:https?:)?\/\/(?:[a-z0-9-]+\.)*linkedin\.com/i,
+    'a LinkedIn address is back on the page');
+
+  // The reader must be able to SEE the link, not only its colour: hover and keyboard focus
+  // both underline. Colour alone would leave #3E5BFF and #4A5478 telling nobody apart.
+  assert.match(src, /\.foot__links a:hover,\.foot__links a:focus-visible\{[^}]*text-decoration:underline/,
+    'the footer links must underline on hover and focus, not rely on colour alone');
+  // They wrap. A single row queued the third address past a 360px screen edge.
+  assert.match(src, /\.foot__links\{[^}]*flex-wrap:wrap/, 'the footer links must wrap on a phone');
+
+  // The picture a shared link paints. og:image must be ABSOLUTE - a crawler has no page to
+  // resolve a relative path against - and the file it names must really be on disk.
+  const meta = (prop, kind = 'property') =>
+    (src.match(new RegExp(`<meta ${kind}="${prop}" content="([^"]*)"`)) || [])[1];
+  assert.strictEqual(meta('og:title'), 'WorkSpace Labs', 'og:title must be the product');
+  assert.strictEqual(meta('og:type'), 'website', 'og:type must be website');
+  assert.strictEqual(meta('og:url'), HOME, 'og:url must be the canonical address');
+  assert.strictEqual(meta('og:description'),
+    (src.match(/<meta name="description" content="([^"]*)"/) || [])[1],
+    'og:description must be the page\'s own description, not a second story');
+  assert.strictEqual(meta('twitter:card', 'name'), 'summary_large_image',
+    'twitter:card must be summary_large_image or X paints a thumbnail');
+
+  const img = meta('og:image');
+  assert.strictEqual(img, `${HOME}assets/og-card.png`, 'og:image must be the absolute card URL');
+  assert.strictEqual(meta('twitter:image', 'name'), img, 'twitter:image must be the same picture');
+  const rel = img.slice(HOME.length);
+  assert.ok(fs.existsSync(path.join(ROOT, rel)), `${rel} is declared to crawlers but not on disk`);
+  assert.ok(fs.existsSync(path.join(ROOT, 'assets/og-card.source.html')),
+    'the card must keep the source HTML it is remade from');
+
+  // The declared size has to be the file's real size, or a timeline reserves the wrong box.
+  const png = fs.readFileSync(path.join(ROOT, rel));
+  assert.strictEqual(png.toString('hex', 12, 16), '49484452', 'og-card.png must be a real PNG');
+  const w = png.readUInt32BE(16), h = png.readUInt32BE(20);
+  assert.strictEqual(Number(meta('og:image:width')), w, `og:image:width must be the file's ${w}`);
+  assert.strictEqual(Number(meta('og:image:height')), h, `og:image:height must be the file's ${h}`);
+  assert.strictEqual(w / h > 1.9 && w / h < 1.92, true,
+    `the card must stay at the 1.91:1 every timeline crops to, measured ${(w / h).toFixed(3)}`);
+});
+
+// ── the person behind the brand stays off the page ───────────────────────────
+//
+// The footer pin above refuses a LinkedIn ADDRESS, which is how his name used to reach a page.
+// It never refused the name itself, so v1.3.0 shipped with the name insertable into visible
+// copy and the suite still green (peer review, 2026-08-31).
+//
+// This repo IS the public site, so a pin that spells the name out would BE the leak it guards
+// against. The name is held here as salted digests of its parts; the page's own letter runs are
+// hashed the same way and compared. Nothing below can be read back into a name.
+//
+// Regenerate after a name change - the parts are typed once on the command line and stored
+// nowhere:  printf '%s' "<the salt> <part>" | shasum -a 256 | cut -c1-32
+//
+// Honest limit, so nobody trusts this further than it goes: a name carries too little entropy
+// for ANY published check to survive a determined dictionary attack by someone who already
+// suspects the exact name - no slow hash fixes that, so none is pretended here. What it does
+// buy is complete: the name is not in the repo, not in a grep, not in GitHub search, and not in
+// a search engine, and an accidental re-introduction fails the suite the moment it lands.
+const NAME_SALT = 'workspace-labs-site/no-real-name/2026-08-31';
+const NAME_LENS = [6, 8, 16];
+const NAME_DIGESTS = new Set([
+  '80edcd1fabe75bb66af318dfff4b9f7f',
+  '812d9f84e24ed70e4758ac08c028c0a8',
+  '66d10c4ffdbb0fbbe621d8270cc93b47',
+  'c6da7251d728b48d5ba0398e11b47063',
+]);
+const nameHash = s =>
+  crypto.createHash('sha256').update(NAME_SALT + ' ' + s).digest('hex').slice(0, 32);
+
+// Every run of letters the page could spell a name with, at the guarded lengths: whole words,
+// windows inside a longer word ("postedbySomeone"), and a short particle rejoined to what
+// follows, because "Al Moonwhistle" and "Van Doren" arrive as two words and are one name.
+function letterRuns(text) {
+  const words = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().split(/[^a-z]+/).filter(Boolean);
+  const runs = new Set();
+  const take = w => {
+    for (const k of NAME_LENS) for (let i = 0; i + k <= w.length; i++) runs.add(w.slice(i, i + k));
+  };
+  words.forEach((w, i) => {
+    take(w);
+    if (w.length <= 3 && i + 1 < words.length) {
+      take(w + words[i + 1]);
+      if (words[i + 1].length <= 3 && i + 2 < words.length) take(w + words[i + 1] + words[i + 2]);
+    }
+  });
+  return runs;
+}
+
+test('a future edit could expose the name while the privacy test stays green', () => {
+  const src = read(LIVE);
+
+  // The recommendation names visible copy; the whole source is walked with it because an HTML
+  // comment is served to every visitor too, and a name in one is just as published.
+  for (const [where, text] of [['visible copy', visible(src)], ['the page source', src]]) {
+    for (const run of letterRuns(text)) {
+      assert.ok(!NAME_DIGESTS.has(nameHash(run)),
+        `the owner's real name is in ${where} of ${LIVE} - this site is handle-only`);
+    }
+  }
+
+  // The machinery has to be able to FAIL, or a broken tokenizer would wave through a page that
+  // names him and this case would prove only that it agrees with itself. Stand-in names with
+  // known digests carry the fixtures instead - one per length the table guards - so the reach
+  // of the check is proved WITHOUT this file spelling the real one, and the fixtures cannot
+  // quietly be built out of whatever the tokenizer already happens to do.
+  const C6 = 'zzcnry', C8 = 'zzcanary', C16 = 'zzcanaryqqfamily';
+  const hits = (text, canary) =>
+    [...letterRuns(text)].some(r => nameHash(r) === nameHash(canary));
+
+  // every way a name actually reaches a page, rehearsed on the stand-in
+  for (const [shape, written, canary] of [
+    ['a name in ordinary copy',        'A site by Zzcanary.',              C8],
+    ['a name shouted',                 'BUILT BY ZZCANARY',                C8],
+    ['a name in a credit line',        '(c) 2026 Zzcanary Qqfamily',       C8],
+    ['a surname listed first',         'Qqfamily, Zzcanary',               C8],
+    ['a particle split off the name',  'Zz Canary',                        C8],
+    ['a hyphen between the parts',     'Zzcanary-Qqfamily',                C8],
+    ['a name run into a longer word',  'postedbyzzcanaryx',                C8],
+    ['a name spelled with an accent',  'Zzćanary',                   C8],
+    ['a name inside an address',       'e-mail zzcanary@example.com',      C8],
+    ['a name inside markup',           '<span>Zzcanary</span>',            C8],
+    ['a name in an attribute',         '<span title="Zzcanary">x</span>',  C8],
+    ['both parts joined up',           'posted by zzcanaryqqfamily today', C16],
+    ['a short form of the name',       'the zzcnry byline',                C6],
+  ]) {
+    assert.ok(hits(written, canary), `the name check misses ${shape}: "${written}"`);
+  }
+
+  // and it must not fire on what merely looks close, or it is noise nobody will keep
+  for (const clean of ['zzcanar', 'azcanary', 'xzcanaryqqfamily',
+                       'The board hands every decision back to you.']) {
+    for (const canary of [C6, C8, C16]) {
+      assert.ok(!hits(clean, canary), `the name check fires on "${clean}", which carries no name`);
+    }
   }
 });

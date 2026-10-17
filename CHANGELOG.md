@@ -3,6 +3,86 @@
 All notable changes to this project. The version lives in `package.json` at this code root and
 moves once per board card (Rule 27).
 
+## [1.3.1] - 2026-09-19
+
+**The GitHub handle on the page is the renamed account.** The footer still carries exactly three
+outbound addresses, in the same order. The GitHub one is now `github.com/workspace-labs` (the
+account formerly `itsmk91`). X and the brand inbox are unchanged. The regression pin names the
+new address in full, so the old handle would fail the suite.
+
+## [1.3.0] - 2026-08-31
+
+**There is now a way to reach him, and a shared link paints a picture instead of a grey box.**
+The site had no outbound link of any kind — someone who read the whole page and wanted to see the
+code, or say something, had nowhere to go — and pasting the address into X, LinkedIn or iMessage
+produced a bare unfurl with no image, because the head carried a title and a description and
+nothing else.
+
+- **Three quiet handles in the footer**, under the two sentences that were already there, in the
+  order he answered them on the card: `github.com/itsmk91`, `@workspacelabs91`, and
+  `workspacelabs91@gmail.com`. Text only — no GitHub or X marks, no word-labels standing in for
+  the handles, no LinkedIn and no real name. Each opens a new tab with
+  `rel="noopener noreferrer"`, so the page it opens gets no handle back on this one. They **wrap**
+  rather than queue: at 360 CSS px they sit on two rows with nothing past the edge, the same
+  lesson the phone nav paid for at launch.
+- **Colour is not the only cue.** The handles read in `--accent-ink` (4.65:1 on the ground,
+  measured off the rendered pixel), and both hover and keyboard focus add an underline — so a
+  reader who cannot separate `#3E5BFF` from the neighbouring `#4A5478` still sees a link. The
+  honest limit: at rest, colour is the only difference from that neighbouring text (**1.46:1**
+  between them). They sit in their own labelled `<nav>` row rather than inside a sentence, and
+  every one of them reads as an address, so nothing is hidden inside prose — and the site's own
+  identity has never underlined a link at rest.
+- **The link-preview card** — `assets/og-card.png`, 2400 × 1260 (a 1200 × 630 canvas at 2×). It is
+  picture **C**, the layout he picked by eye from three: the headline and the mark on the left,
+  the Overview window on the right, on the site's daylight ground. It was **rebuilt into the
+  repo** from the site's own three files — the same woff2 the page reads in, the same
+  `logo-mark.png` the header carries, the same `screens/overview.webp` the hero paints — so the
+  card cannot drift from the page. `assets/og-card.source.html` remakes it, and `ASSETS.md`
+  carries the one command. Checked against the accepted mock pixel by pixel: 79.7 % of pixels
+  identical and a mean difference of 1.4/255, all of it glyph antialiasing (the difference mask
+  is hollow letter outlines, not doubled shapes — nothing moved).
+- **The head tags a crawler actually reads**: `og:title`, `og:type`, `og:url`, the page's own
+  description reused verbatim, an **absolute** `og:image` (a relative path resolves against
+  nothing and shows no picture), width and height matching the real file, `twitter:card:
+  summary_large_image` and the same absolute `twitter:image`. The favicon, the apple-touch-icon
+  and the canonical are untouched.
+- **Two pins were widened on purpose, and both got stronger.** One required every anchor on the
+  page to be an in-page `#` link; it now names the **three exact addresses** one at a time — not a
+  host pattern — and additionally requires them in order with no repeats, so a second GitHub
+  account, twitter.com, a fourth link or any other mailto still fails. The other banned every
+  `@handle` in visible copy; it now removes the brand's **own two names** before the ban runs, so
+  any other handle still fails, and it gained a refusal for a linkedin.com or twitter.com
+  **address** anywhere in the source.
+- **A new pin** holds this card's whole shape shut: the two original sentences, exactly three
+  links in a labelled nav, each one's href *and* visible handle *and* `target` *and* `rel`, no
+  marks, the underline cue, the wrap rule, and every og tag — including that `og:image` is
+  absolute, that its declared width and height are read back out of the PNG's own header, and
+  that the file and its source HTML are on disk. **All 20 ways this could break were proved to
+  fail** by mutating a disposable copy one at a time and restoring it byte-verified.
+
+- **And the name itself is now pinned, not just LinkedIn** (peer review, 2026-08-31). The
+  identity pin above refused a linkedin.com *address*, because that is how his name used to
+  reach a page — it never refused the **name**, so the reviewer put it straight into visible
+  footer copy and all 18 tests stayed green. A new pin closes that: it holds the owner's name as
+  **salted digests of its parts**, hashes every run of letters the page could spell a name with,
+  and refuses a match. It reads visible copy *and* the whole source, because an HTML comment is
+  served to every visitor too. Because this repo **is** the public site, a pin that spelled the
+  name out would have been the leak it guards against — so nothing readable is stored, and the
+  regeneration recipe takes the parts on the command line and keeps none of them. Proved by
+  writing a stand-in name into a disposable copy **15 ways** — in copy, shouted, in a credit
+  line, surname first, hyphenated, particle split into two words, accented, joined, run inside a
+  longer word, in an HTML comment, in a `title` attribute — and requiring the suite to go red
+  each time; it did, 15 of 15, and the copy restored byte-verified. Four near-misses must stay
+  green, and do. The honest limit is written where it is read, in the test itself: a name carries
+  too little entropy for any published check to survive a determined dictionary attack by someone
+  who already suspects the exact name, so no slow hash pretends otherwise. What it does buy is
+  complete — the name is not in the repo, not in a grep, not in GitHub search, not in a search
+  engine, and an accidental re-introduction now fails the suite the moment it lands.
+
+*(The number moved 1.2.0 → **1.3.0**, not to 1.2.0 as the plan predicted: 1.2.0 had already been
+spent by the search-engine card that shipped earlier the same day. Rule 27 moves the number once
+per card, so this card takes the next one.)*
+
 ## [1.2.0] - 2026-08-31
 
 **The site tells search engines what it is.** It had no `robots.txt` and no sitemap, so there was

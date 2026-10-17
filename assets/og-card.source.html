@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WorkSpace Labs — link preview card (source)</title>
+<!--
+  The source of `assets/og-card.png` — the picture X, LinkedIn, iMessage and Slack show when
+  someone shares https://workspace-labs.net/. This is picture C, the layout he picked by eye on
+  2026-08-30: the headline and the mark on the left, the Overview window on the right.
+
+  It pulls the SITE's own three files by relative path, so the card can never drift from the page:
+    fonts/plus-jakarta-sans-var.woff2   the same face the page reads in
+    logo-mark.png                       the same mark the header carries
+    screens/overview.webp               the same capture the hero paints
+
+  Remake it (2400 x 1260 — a 1200 x 630 canvas at 2x, so the text stays sharp on a retina timeline):
+
+    "$HOME/Library/Caches/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-mac-arm64/chrome-headless-shell" \
+      --headless --disable-gpu --hide-scrollbars --force-color-profile=srgb \
+      --allow-file-access-from-files --force-device-scale-factor=2 \
+      --window-size=1200,630 --virtual-time-budget=6000 \
+      --screenshot=assets/og-card.png "file://$PWD/assets/og-card.source.html"
+
+  `--allow-file-access-from-files` is what lets it read the three sibling assets off disk;
+  `--virtual-time-budget` is what waits for the woff2 to load before the shutter.
+-->
+<style>
+  @font-face {
+    font-family: "Plus Jakarta Sans";
+    src: url("fonts/plus-jakarta-sans-var.woff2") format("woff2");
+    font-weight: 200 800;
+    font-style: normal;
+  }
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    background: #F2F5FF;
+    color: #10182E;
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+    display: grid;
+    grid-template-columns: 460px 1fr;
+  }
+  .copy {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 48px 40px 48px 52px;
+  }
+  .mark {
+    width: 56px; height: 56px; border-radius: 14px;
+    display: block; margin: 0 0 22px;
+    box-shadow: 0 8px 20px rgba(40,58,120,.10);
+    border: 1px solid rgba(40,58,120,.10);
+  }
+  .brand {
+    font-size: 15px; font-weight: 650; letter-spacing: .04em;
+    text-transform: uppercase; color: #4A5478; margin: 0 0 14px;
+  }
+  h1 {
+    font-size: 36px; line-height: 1.1; letter-spacing: -.03em;
+    font-weight: 780; margin: 0;
+  }
+  h1 em { font-style: normal; color: #3E5BFF; }
+  .line { margin: 20px 0 0; font-size: 18px; font-weight: 600; color: #3E5BFF; }
+  .shot {
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+  }
+  .shot img {
+    position: absolute; inset: 24px 0 24px 0;
+    width: calc(100% + 40px); height: calc(100% - 48px);
+    object-fit: cover; object-position: left 22%;
+    border-radius: 16px 0 0 16px;
+    box-shadow: 0 16px 40px rgba(40,58,120,.14);
+    border: 1px solid rgba(40,58,120,.10);
+    border-right: 0;
+  }
+</style>
+</head>
+<body>
+  <div class="copy">
+    <img class="mark" src="logo-mark.png" width="56" height="56" alt="">
+    <p class="brand">WorkSpace Labs</p>
+    <h1>The AI does the work.<br><em>You keep every decision.</em></h1>
+    <p class="line">AI can act. Human decide.</p>
+  </div>
+  <div class="shot">
+    <img src="screens/overview.webp" alt="">
+  </div>
+</body>
+</html>

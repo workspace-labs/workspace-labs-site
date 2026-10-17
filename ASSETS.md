@@ -127,6 +127,56 @@ desktop the artwork carries its own typography, full-bleed, exactly as the piece
 
 ---
 
+## The link-preview card
+
+`assets/og-card.png` — **2400 × 1260**, a 1200 × 630 canvas rendered at 2×, which is the 1.91:1
+shape every timeline crops to. It is what X, LinkedIn, iMessage and Slack paint when
+`https://workspace-labs.net/` is shared.
+
+**Where the layout came from.** Three cards were drawn and shown side by side on 2026-08-30 —
+A (the app window full-bleed), B (the headline and mark alone), C (both: headline beside the
+window). **He picked C by eye.** A and B were not shipped and are not in this repo.
+
+**Nothing here was drawn or invented.** The card is built from three files this site already
+serves, by relative path, so it can never drift from the page:
+
+| In the card | The site's own file |
+|---|---|
+| the type | `assets/fonts/plus-jakarta-sans-var.woff2` — the face the page reads in |
+| the mark | `assets/logo-mark.png` — the mark the header carries |
+| the window | `assets/screens/overview.webp` — the capture the hero paints |
+
+The three approved lines, exactly as he accepted them: **WorkSpace Labs** · *The AI does the work.
+You keep every decision.* · *AI can act. Human decide.*
+
+**Remake it** — from the project root:
+
+```bash
+"$HOME/Library/Caches/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-mac-arm64/chrome-headless-shell" \
+  --headless --disable-gpu --hide-scrollbars --force-color-profile=srgb \
+  --allow-file-access-from-files --force-device-scale-factor=2 \
+  --window-size=1200,630 --virtual-time-budget=6000 \
+  --screenshot=assets/og-card.png "file://$PWD/assets/og-card.source.html"
+```
+
+`--allow-file-access-from-files` is what lets the page read its three sibling assets off disk;
+`--virtual-time-budget` is what waits for the woff2 before the shutter. `--force-color-profile=srgb`
+keeps the colours on the tokens.
+
+**Any other size is a re-render of that source, never an upscale of the PNG.** Change
+`--window-size` (the CSS canvas stays 1200 × 630) or `--force-device-scale-factor`.
+
+**It was checked against the accepted mock, not assumed to match.** Rendering it here uses a
+different rasterizer than the Electron shot he approved, so the two PNGs are compared pixel by
+pixel: **79.7 % of pixels identical**, mean difference **1.4/255**, and the amplified difference
+mask is nothing but **hollow glyph outlines** — the signature of antialiasing. A layout that had
+shifted would show solid doubled shapes instead. Same picture, different pen.
+
+**If the header mark, the font, or the Overview capture ever changes, remake this card** — it
+reads those exact files, so a stale card is the one way it can lie about the page.
+
+---
+
 ## Fonts
 
 | On the page | Original | Licence |

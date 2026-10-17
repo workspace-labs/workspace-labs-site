@@ -84,6 +84,16 @@ application. Do not attempt to key the background out; the glow has no clean edg
 blue-grey smudge. Five options were rendered at true size and he chose this one having seen that.
 Any future resize starts from `logo-src.png` in the app repo, never from this 96px file.
 
+**The link-preview card uses this same identity, not a second one.** `assets/og-card.png` is
+built from the site's own font, this mark and the Overview capture, on `--space`, with the
+headline in `--ink` and its second line plus the tagline in `--accent-ink`. It is picture **C**,
+chosen by eye from three on 2026-08-30. It declares nothing new: if the mark or the face changes,
+the card is remade from `assets/og-card.source.html` (see `ASSETS.md`), never redrawn.
+
+**Footer links** read in `--accent-ink` (4.65:1 on the ground) and go to `--accent-2` on hover and
+on `:focus-visible`, which also **underline** — the site's only underline, and it exists so the
+link is not signalled by colour alone. No new token, no new colour.
+
 ## Shape, spacing, motion
 
 - **Radius** — `20px` big surfaces · `12px` cards · `9px` buttons · `6px` chips · `99px` pills.

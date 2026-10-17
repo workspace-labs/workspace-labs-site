@@ -5,11 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>WorkSpace Labs</title>
 <meta name="description" content="A human-gated build system: the AI does the work, the person keeps the decisions.">
-<!-- The other addresses (www, plain http, and the itsmk91.github.io backup) already 301 here,
+<!-- The other addresses (www, plain http, and the workspace-labs.github.io backup) already 301 here,
      so this is not what consolidates them. What it does do: a link shared with tracking
      parameters (?utm_source=...) is a different URL to a crawler, and this collapses every
      such variant onto the clean address. It is also the backstop if a redirect is ever lost. -->
 <link rel="canonical" href="https://workspace-labs.net/">
+
+<!-- The link preview: what X, LinkedIn, iMessage and Slack paint when this address is shared.
+     og:image must be ABSOLUTE - a crawler resolves it against nothing, so a relative path shows
+     no picture at all. It is picture C, the layout he chose by eye; assets/og-card.source.html
+     remakes it. -->
+<meta property="og:title" content="WorkSpace Labs">
+<meta property="og:description" content="A human-gated build system: the AI does the work, the person keeps the decisions.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://workspace-labs.net/">
+<meta property="og:image" content="https://workspace-labs.net/assets/og-card.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1260">
+<meta property="og:image:alt" content="WorkSpace Labs - the AI does the work, you keep every decision.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://workspace-labs.net/assets/og-card.png">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <style>
@@ -192,8 +207,17 @@ figure{margin:0}
 .band .btn--solid{margin-top:30px;background:#fff;color:var(--ink)}
 .band .btn--solid:hover{background:#E4E9FF}
 footer{border-top:1px solid var(--line);margin-top:clamp(48px,7vw,88px)}
-.foot__in{max-width:1200px;margin:0 auto;padding:32px var(--gutter);display:flex;flex-wrap:wrap;
-  gap:12px;align-items:center;justify-content:space-between;color:var(--ink-soft);font-size:.8125rem}
+.foot__in{max-width:1200px;margin:0 auto;padding:32px var(--gutter);display:flex;flex-direction:column;
+  gap:14px;color:var(--ink-soft);font-size:.8125rem}
+.foot__line{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+/* The three handles. They WRAP rather than queue in one row, the same lesson the phone nav
+   paid for: at 360 CSS px a single row would push the last address past the right edge. */
+.foot__links{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center}
+.foot__links a{color:var(--accent-ink);text-decoration:none;
+  display:inline-flex;align-items:center;min-height:24px}
+/* Colour is not the only cue: hover and keyboard focus both underline, so a reader who does not
+   separate #3E5BFF from #4A5478 still sees a link. :focus-visible also draws the page's 3px ring. */
+.foot__links a:hover,.foot__links a:focus-visible{color:var(--accent-2);text-decoration:underline}
 
 @media (max-width:719px){
   html{scroll-padding-top:144px}
@@ -397,8 +421,15 @@ footer{border-top:1px solid var(--line);margin-top:clamp(48px,7vw,88px)}
 
 <footer>
   <div class="foot__in">
-    <span>WorkSpace Labs</span>
-    <span>AI can act. Human decide.</span>
+    <div class="foot__line">
+      <span>WorkSpace Labs</span>
+      <span>AI can act. Human decide.</span>
+    </div>
+    <nav class="foot__links" aria-label="WorkSpace Labs elsewhere">
+      <a href="https://github.com/workspace-labs" target="_blank" rel="noopener noreferrer">github.com/workspace-labs</a>
+      <a href="https://x.com/workspacelabs91" target="_blank" rel="noopener noreferrer">@workspacelabs91</a>
+      <a href="mailto:workspacelabs91@gmail.com" target="_blank" rel="noopener noreferrer">workspacelabs91@gmail.com</a>
+    </nav>
   </div>
 </footer>
 </body>
