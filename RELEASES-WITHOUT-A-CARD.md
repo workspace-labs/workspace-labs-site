@@ -1,0 +1,1 @@
+- 1.3.2 - 2026-10-19 - Document the existing palette, font sources and readability pairs in DESIGN.md for the Workspace Palette window (direct chat authorization).

@@ -3,6 +3,12 @@
 All notable changes to this project. The version lives in `package.json` at this code root and
 moves once per board card (Rule 27).
 
+## [1.3.2] - 2026-10-19
+
+- Document the existing colors, font sources and readability pairs in DESIGN.md for the Workspace Palette window, using the owner-approved preview contract. Today's application colors and fonts are unchanged.
+- Record the actual translucent hairline as `#283A781A` (`rgba(40,58,120,.10)`) for the Palette preview instead of the former solid stand-in; site styling is unchanged.
+- Direct chat authorization for the Palette window documentation; no Backloop card.
+
 ## [1.3.1] - 2026-09-19
 
 **The GitHub handle on the page is the renamed account.** The footer still carries exactly three

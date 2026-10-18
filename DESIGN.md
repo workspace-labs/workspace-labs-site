@@ -146,3 +146,28 @@ The method was cross-checked against the arithmetic, which is how you know the r
 `#10182E` on `#F2F5FF` computes to **16.17:1** and measures **16.17:1** off the pixel.
 
 Re-run it before changing any colour.
+
+## Palette window
+
+Read by the Workspace Palette window. One line per item; change these only with the owner's approval (Rule 15).
+
+### Mode
+- light
+
+### Colors
+- bg · Space · Page ground · #F2F5FF
+- surface · Panel · Cards · #FFFFFF
+- brand · Aurora · Accent · #3E5BFF
+- ink · Ink · Text · #10182E
+- soft · Ink soft · Second text · #4A5478
+- line · Line · Hairlines · #283A781A
+
+### Fonts
+- heading · Plus Jakarta Sans · assets/fonts/plus-jakarta-sans-var.woff2
+- body · Plus Jakarta Sans · assets/fonts/plus-jakarta-sans-var.woff2
+
+### Readability
+- ink on bg · Headline on page · 4.5
+- soft on bg · Body text on page · 4.5
+- #FFFFFF on brand · White on the main button · 4.5
+- brand on bg · Accent eyebrows · 4.5
