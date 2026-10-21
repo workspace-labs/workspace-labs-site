@@ -3,6 +3,14 @@
 All notable changes to this project. The version lives in `package.json` at this code root and
 moves once per board card (Rule 27).
 
+## [1.5.1] - 2026-10-22
+
+- **Removed `TASK-apple-readiness.md` from the site root.** It was the task list for 1.4.0, and
+  because this folder is the published site it was served at a public URL — with the owner's
+  first name in it, against the site's handle-only rule. The work it described is done and
+  recorded under 1.4.0. The file remains in this repository's history.
+- Owner's go, no Backloop card.
+
 ## [1.5.0] - 2026-10-22
 
 **The site shows the app as it is today, 8.0.8, not as it was on 30 August (2.8.1).** Every
