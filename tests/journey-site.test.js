@@ -120,7 +120,7 @@ test('the window row goes back to a grid and reopens the sixth-window hole', () 
 
   // Notes is the lead tile, and it is the FIRST one
   const figs = [...read(LIVE).matchAll(/<figure( class="lead")?><img src="assets\/screens\/([a-z-]+)\.webp"/g)];
-  assert.strictEqual(figs.length, 5, 'the gallery holds five window tiles');
+  assert.strictEqual(figs.length, 7, 'the gallery holds seven window tiles (v1.5.0: The Brief and Prompt Generator retired; Tasks, Calendar, Palette, Agents added)');
   assert.strictEqual(figs[0][2], 'notes', 'Notes must be the first gallery tile');
   assert.ok(figs[0][1], 'Notes must carry the lead class');
   assert.ok(figs.slice(1).every(f => !f[1]), 'only Notes may be the lead tile');
@@ -145,7 +145,7 @@ test('the page loads its pictures from the concepts folder it no longer lives in
   const src = read(LIVE);
   const srcs = [...src.matchAll(/src="([^"]+)"/g)].map(m => m[1]);
   const screens = srcs.filter(s => s.startsWith('assets/screens/'));
-  assert.strictEqual(screens.length, 9, 'nine window pictures on the page');
+  assert.strictEqual(screens.length, 11, 'eleven window pictures on the page');
   for (const s of srcs) {
     assert.ok(s.startsWith('assets/'), `${s} is not a root-relative site path`);
     assert.ok(fs.existsSync(path.join(ROOT, s)), `${s} is referenced but not on disk`);
@@ -199,8 +199,8 @@ test('the Knowledge caption still names counts that rotate', () => {
   assert.ok(cap, 'the Knowledge caption must be findable');
   assert.doesNotMatch(cap[0], /\b210\b/, 'the rotating note count is back in the caption');
   assert.doesNotMatch(cap[0], /\b32\b/, 'the rotating skill count is back in the caption');
-  assert.match(cap[0], /28 rules/, 'the caption must keep 28 rules');
-  assert.match(src, /Twenty-eight rules/, 'the rail must keep its twenty-eight rules line');
+  assert.match(cap[0], /22 in force/, 'the caption must say 22 rules in force');
+  assert.match(src, /Twenty-two rules/, 'the rail must keep its twenty-two rules line');
 });
 
 test("the visible copy breaks the human's version-one content decision", () => {
@@ -272,14 +272,14 @@ test('the handoff documents are not true to the final state', () => {
   // Every size a document states must be a size that is really on disk.
   const dir = path.join(ROOT, 'assets/screens/4k');
   const masters = fs.readdirSync(dir).filter(f => f.endsWith('.png'));
-  assert.strictEqual(masters.length, 9, 'nine masters, one per window on the site');
+  assert.strictEqual(masters.length, 11, 'eleven masters, one per window on the site');
 
   // PNG carries its size at a fixed offset in the IHDR chunk.
   const size = f => {
     const b = fs.readFileSync(path.join(dir, f));
     return [b.readUInt32BE(16), b.readUInt32BE(20)];
   };
-  const claimed = /the same nine at (\d+) x (\d+)/.exec(read('README.md'));
+  const claimed = /the same eleven at (\d+) x (\d+)/.exec(read('README.md'));
   assert.ok(claimed, 'the README must state the master size');
   for (const f of masters) {
     const [w, h] = size(f);
@@ -288,7 +288,7 @@ test('the handoff documents are not true to the final state', () => {
   }
   // nine web copies too, one per master
   const web = fs.readdirSync(path.join(ROOT, 'assets/screens')).filter(f => f.endsWith('.webp'));
-  assert.strictEqual(web.length, 9, 'nine web-sized copies, one per master');
+  assert.strictEqual(web.length, 11, 'eleven web-sized copies, one per master');
 });
 
 test("the README overstates this page's screen-image sharpness", () => {
@@ -721,4 +721,34 @@ test('Apple finds no contact address, no copyright line, or no privacy policy on
   for (const r of refs) {
     assert.ok(fs.existsSync(path.join(ROOT, 'privacy', r)), `${r} is referenced by the privacy page but not on disk`);
   }
+});
+
+// ── the page keeps up with the app (v1.5.0, re-captured from 8.0.8) ──────────
+
+test('the site still shows windows the app retired, or a rule the app deleted', () => {
+  const src = read(LIVE);
+  const text = visible(src);
+
+  // The Brief (removed in 5.0.0) and the Prompt Generator (retired 2026-10-09) are gone from
+  // the app, so their tiles and their pictures are gone from the site.
+  for (const gone of ['The Brief', 'Prompt Generator']) {
+    assert.ok(!text.includes(gone), `the page still shows ${gone}, which the app removed`);
+  }
+  for (const f of ['the-brief', 'prompt']) {
+    assert.ok(!fs.existsSync(path.join(ROOT, `assets/screens/${f}.webp`)), `assets/screens/${f}.webp is back`);
+    assert.ok(!fs.existsSync(path.join(ROOT, `assets/screens/4k/${f}.png`)), `assets/screens/4k/${f}.png is back`);
+  }
+  // The round-3 stop was deleted from the rules on 2026-09-07; the page must not promise it.
+  assert.doesNotMatch(text, /third round|cannot run forever/i, 'a rule card still claims the deleted round-3 stop');
+  assert.doesNotMatch(text, /twenty-eight|\b28 rules\b/i, 'the page still counts 28 rules');
+
+  // The gallery, in order: today's windows, Notes as the lead.
+  const tiles = [...src.matchAll(/<figure( class="lead")?><img src="assets\/screens\/([a-z-]+)\.webp"/g)].map(m => m[2]);
+  assert.deepStrictEqual(tiles, ['notes', 'plan', 'tasks', 'calendar', 'palette', 'agents', 'projects'],
+    `the gallery tiles drifted: ${tiles}`);
+
+  // Agents Labs is the one picture not re-taken (it would attach to the live crew); its caption
+  // has to say when it was captured, so an older window is never passed off as today's.
+  const labs = /agents-labs\.webp[\s\S]*?<figcaption>([^<]*)<\/figcaption>/.exec(src);
+  assert.ok(labs && /Captured 30 August/.test(labs[1]), 'the Agents Labs caption must say it was captured on 30 August');
 });

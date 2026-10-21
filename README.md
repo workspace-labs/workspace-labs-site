@@ -44,8 +44,8 @@ site is unaffected.
 index.html          the site — hero, the board, the agents, the rules, the windows
 privacy/index.html  the privacy policy, at /privacy/ — the address Apple is given
 archive/            the three shapes the site was chosen from, kept as the record
-assets/screens/     nine app windows, web-sized
-assets/screens/4k/  the same nine at 4500 x 3000, so any later size is a resize
+assets/screens/     eleven app windows, web-sized
+assets/screens/4k/  the same eleven at 4500 x 3000, so any later size is a resize
 assets/orbit/       the orbital artwork, plus the source HTML it re-renders from
 assets/logo-mark.png     the header mark — the logo trimmed and exported at 96px for a 30px slot
 assets/favicon-32.png    the browser tab icon
@@ -115,11 +115,11 @@ problem:
 - The header carries a **visible dashed slot** with room for one more item — visible on a phone
   too, which is where it first was not. On a 360 px screen the nav lays out as an even
   three-column grid and the slot ends at 200 px, inside the screen, with no sideways scroll.
-- **The window row is flex, not grid.** Notes is the lead tile at double width, so five tiles fill
-  six cells with no hole — and because no tile may grow into leftover space, a sixth window added
-  later wraps onto its own row and **centres** instead of stretching across it. Proven rather than
-  intended: a sixth tile inserted into the live page measures one cell wide (332 px at 768,
-  331 px at 1440) with equal gaps either side, then removed.
+- **The window row is flex, not grid.** Notes is the lead tile at double width, and no tile may
+  grow into leftover space, so a short last row **centres** instead of stretching across it. That
+  is how v1.5.0 took the gallery from five tiles to seven without touching the layout: at 1440 the
+  rows read lead + one, three, then two, and the last pair sits 185 px from either side; at 768
+  and 1024 the lead takes a row and the six pair up with no hole (measured 2026-10-22).
 - Every picture is referenced from its own source file, so a later size is a re-render, not a
   re-capture.
 - Nothing in the visible copy says the app is unavailable, closed, or private — version one is
@@ -140,7 +140,9 @@ Driven in a real browser, not asserted:
 - **Every control is at least 24 × 24 px** at phone width; the focus ring is 3 px and visible;
   the skip link parks off-screen and returns on focus.
 - **Reduced motion loses nothing.** With `prefers-reduced-motion: reduce`, the page carries the
-  same 3,710 characters of copy and the same nine pictures as it does without.
+  same 3,873 characters of copy and the same twelve pictures (eleven windows and the mark) as it
+  does without — re-measured for v1.5.0 at 360, 768, 1024 and 1440 px, with nothing past the edge
+  and no broken image at any of them.
 - **No remote requests.** No font fetch, no script, no form, no analytics, no API call.
 - **Every asset resolves** and no image is broken.
 
@@ -148,11 +150,24 @@ Driven in a real browser, not asserted:
 
 ## About the pictures
 
-Every window was captured on 2026-08-30 from the app that was actually running — version 2.8.1 —
-by driving the app's own navigation functions over a debugging port. No mock data and no fixture:
-the board screenshot shows the real card that was in flight while these pages were being built,
-and Agents Labs shows the three agents working on it. **This build re-captured nothing** — it uses
-that same set.
+**Ten windows were re-captured on 2026-10-22 from WorkSpace Labs 8.0.8** (v1.5.0 of this site) —
+the installed app's own code, run as a hidden private copy and driven through its own navigation
+functions over a debugging port, so the owner's running app was never touched. That copy read a
+**private catalog holding only the two public projects** — the app itself and this site. Every
+board card, lesson, plan line and bug entry that named another project, a person, a home path or
+the machine was left out of that catalog, and every capture's rendered text was scanned for the
+same before it was used. The Tasks and Calendar pictures show real tasks from that week's public
+work, not the owner's personal list.
+
+Two pictures are not what a first guess would expect:
+
+- **The board section shows a finished card opened over the board**, not the bare board. On
+  capture day every card had been accepted, and finished cards leave the board two hours after
+  Accept, so the honest board was six empty columns. The card shows the same road instead: all six
+  stages ticked, with its plan, its exam, the delivery and the review.
+- **Agents Labs is still the 2026-08-30 capture from version 2.8.1**, and its caption says so.
+  Opened in a private copy, that window attaches to the live agents' terminals — and it is the
+  window that once leaked the owner's name (below). It was kept on purpose, not missed.
 
 Masters are **4500 x 3000** (an 1800 x 1200 window at 2.5x). The pages load 2304-wide copies. On
 this page the hero is capped at **1100** CSS px, and it is the widest any picture paints — measured
@@ -177,8 +192,8 @@ replays it, so a pane that reads clean in the terminal can still paint the old l
 app. Re-take; never crop and never blur. `ASSETS.md` has the full account and the steps.
 
 An earlier set of pictures was replaced: they were 1536 x 1024, and they turned out to be a mockup
-and a demo shell rather than the app — their rail read `Backloop · V2.6.0` where the app now reads
-`BackLoop` and 2.8.1, and they showed five board columns where the app has six. `ASSETS.md` has
+and a demo shell rather than the app — their rail read `Backloop · V2.6.0` where the app by then
+read `BackLoop` and 2.8.1, and they showed five board columns where the app has six. `ASSETS.md` has
 the full trace.
 
 ---

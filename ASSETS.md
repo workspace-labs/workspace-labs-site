@@ -5,31 +5,52 @@ artwork file. Nothing was drawn, invented, or upscaled.
 
 ---
 
-## The nine app windows
+## The eleven app windows
 
-Captured on **2026-08-30** from the app that was running at the time — `WorkSpace Labs.app`
-version **2.8.1** — by driving its own navigation functions over a debugging port. No mock data,
-no fixture, no clicking: the board shows the real card that was in flight while these pages were
-being built.
+**Ten were re-captured on 2026-10-22** from `WorkSpace Labs.app` version **8.0.8** (site v1.5.0).
+**Agents Labs is the 2026-08-30 capture from 2.8.1**, kept on purpose (below).
 
-| On the page | Window | Captured via |
-|---|---|---|
-| `overview.webp` | Overview | `showHome()` |
-| `backloop.webp` | BackLoop | `showBoard()` |
-| `notes.webp` | Notes | `showNotes()` |
-| `knowledge.webp` | Knowledge | `showKnowledge()` |
-| `the-brief.webp` | The Brief | `showWorkspaceBrief()` |
-| `prompt.webp` | Prompt Generator | `showWorkspacePrompt()` |
-| `agents-labs.webp` | Agents Labs | `showWorkspaceCockpit()` |
-| `plan.webp` | Plan | `showPlan()` |
-| `projects.webp` | Projects | `showProjectsList()` |
+| On the page | Window | Captured via | Taken |
+|---|---|---|---|
+| `overview.webp` | Overview (Home) | `showHome()` | 2026-10-22 |
+| `backloop.webp` | A finished card over the board | `showBoard()` then `openTask('workspace-app', 't-1788262729033')` | 2026-10-22 |
+| `knowledge.webp` | Knowledge | `showKnowledge()` | 2026-10-22 |
+| `notes.webp` | Notes | `showNotes()` | 2026-10-22 |
+| `plan.webp` | Plan, one roadmap open | `showPlan()` then the first `[data-plan]` card | 2026-10-22 |
+| `tasks.webp` | Tasks | `showWorkspaceTasks()` | 2026-10-22 |
+| `calendar.webp` | Calendar | `showWorkspaceCalendar()` | 2026-10-22 |
+| `palette.webp` | Palette | `showPaletteWindow()` | 2026-10-22 |
+| `agents.webp` | Agents | `topBarRoute('agents')` over Home | 2026-10-22 |
+| `projects.webp` | Projects | `showProjectsList()` | 2026-10-22 |
+| `agents-labs.webp` | Agents Labs | `showWorkspaceCockpit()` | 2026-08-30 |
+
+**How the 2026-10-22 set was taken.** The owner's running app was never touched. The installed
+app's own code (`WorkSpace Labs.app/Contents/Resources/app.asar`) was started as a **hidden**
+private copy — no window on screen, no Dock icon — with its own profile and `WS_DIR` pointing at a
+**private catalog**. That catalog held only the two public projects, the app itself and this
+site; every board card, lesson, plan line and bug entry naming another project, a person, a home
+path or the machine was left out of it. Every capture's rendered text was then scanned for the
+same terms before the picture was used, and every picture was looked at. The Tasks and Calendar
+windows show real tasks from that week's public work.
+
+**Why the board section shows a card, not the board.** On capture day every card had been
+accepted, and a finished card leaves the board two hours after Accept — the honest board was six
+empty columns. The section shows a finished card opened over the board instead: the same six
+stages, ticked, with its plan, exam, delivery and review.
+
+**Why Agents Labs was not re-taken.** Opened in a private copy, that window attaches to the live
+agents' terminal sessions — and it is the window that leaked the owner's name once (below). The
+August picture stays, and its caption on the page says when it was captured.
+
+The Brief (removed from the app in 5.0.0) and the Prompt Generator (retired 2026-10-09) left the
+site with this set; their pictures were deleted, not kept.
 
 **Two files per window.**
 
 - `assets/screens/4k/<name>.png` — the master, **4500 × 3000**. An 1800 × 1200 logical window at
   device scale factor 2.5. Above 4K, and roughly three times the resolution of the previous set.
-- `assets/screens/<name>.webp` — what the pages load, **2304 × 1536** at quality 84. Nine of them
-  come to 858 KB. On the site the hero is capped at **1100** CSS px and is the widest any picture
+- `assets/screens/<name>.webp` — what the pages load, **2304 × 1536** at quality 84. All eleven
+  come to 952 KB. On the site the hero is capped at **1100** CSS px and is the widest any picture
   paints — measured at 1440, 1920, 2560 and 3840 px viewports, the answer is 1100 px every time —
   so every picture renders at **2.09×** and never thins out on a wide screen. The master is right
   there at 4500 × 3000 if a larger size is ever wanted — a resize, not a re-capture.
@@ -46,8 +67,8 @@ Any other size is a resize of the master, not a re-capture:
 cwebp -q 84 -m 6 -resize <width> 0 assets/screens/4k/<name>.png -o <out>.webp
 ```
 
-To take the set again, launch the app with `--remote-debugging-port=9222` and drive those same
-nine functions. That is the app's own navigation path, so nothing is faked into place.
+To take the set again, start a hidden private copy on a private catalog as above, with
+`--remote-debugging-port`, and drive the functions in the table — the app's own navigation path, so nothing is faked into place.
 
 **Nothing was re-captured when Concept B became the site (2026-08-30).** That build reused this
 exact set, byte for byte; the only picture change on the whole card was the page moving up one
@@ -173,7 +194,9 @@ mask is nothing but **hollow glyph outlines** — the signature of antialiasing.
 shifted would show solid doubled shapes instead. Same picture, different pen.
 
 **If the header mark, the font, or the Overview capture ever changes, remake this card** — it
-reads those exact files, so a stale card is the one way it can lie about the page.
+reads those exact files, so a stale card is the one way it can lie about the page. **Remade
+2026-10-22** (v1.5.0) when the Overview capture became the 8.0.8 Home; layout C and the three lines
+are unchanged.
 
 ---
 

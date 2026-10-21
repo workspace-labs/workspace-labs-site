@@ -3,6 +3,37 @@
 All notable changes to this project. The version lives in `package.json` at this code root and
 moves once per board card (Rule 27).
 
+## [1.5.0] - 2026-10-22
+
+**The site shows the app as it is today, 8.0.8, not as it was on 30 August (2.8.1).** Every
+picture but one was taken in August, and several sentences had stopped being true: the page
+counted 28 rules, promised a round-3 stop the rules deleted on 7 September, and showed The Brief
+and the Prompt Generator, which the app has since removed.
+
+- **Ten windows re-captured** from the installed 8.0.8 code, run as a hidden private copy on a
+  private catalog that held only the two public projects (the app and this site). Cards, lessons,
+  plan lines and bug entries naming anything else were left out of that catalog; every capture's
+  rendered text was scanned and every picture looked at. Masters 4500 × 3000, web copies 2304
+  wide, as before. `ASSETS.md` has the method.
+- **Hero** — the new Home ("You decide. The agents build."). The link-preview card was remade
+  from it; layout C and its three lines are unchanged.
+- **Board section** — a finished card opened over the board, all six stages ticked. The bare board
+  was empty on capture day (finished cards leave it two hours after Accept), so the card shows the
+  road instead.
+- **Agents Labs keeps its 30 August picture**, by the owner's choice: a private copy would attach
+  to the live agents' terminals. Its caption now says when it was captured.
+- **Knowledge** — the new map of lessons; the caption counts 22 rules in force and five folded.
+- **Gallery** — Notes (the new record of finished work), Plan (a roadmap as a triage board),
+  Tasks, Calendar, Palette, Agents and Projects. The Brief and Prompt Generator are gone, pictures
+  included. Same flex row; seven tiles centre their short last row.
+- **Rules** — 28 becomes 22 in the rail and the rules section. Card 3, "The loop cannot run
+  forever", is replaced by **"No picture, no review"** (Rule 1), the owner's pick.
+- **Tests** — the count pins move to eleven pictures, seven tiles and 22 rules; one new pin keeps
+  the retired windows, their files and the deleted round-3 rule from coming back, holds the
+  gallery order, and requires the Agents Labs caption to carry its capture date. `npm test`:
+  21 of 21 pass.
+- Direct chat authorization, no Backloop card.
+
 ## [1.4.0] - 2026-10-22
 
 **The site is ready for Apple Developer enrollment.** Apple looks for a real site on the

@@ -106,13 +106,15 @@ its underline at rest, because it sits among `--ink-soft` text and colour cannot
 - **Measure** — body copy is capped around 52–64 characters.
 - **The window row is flex, never grid.** The gallery is `display:flex; flex-wrap:wrap;
   justify-content:center`, Notes is the lead tile at double width, and no tile may `flex-grow`.
-  That is what makes five tiles fill six cells with no hole *and* a sixth window land centred
-  later instead of stretching across its row. A grid reopens the gap; this is a locked decision
-  (2026-08-30), not a layout preference.
+  That is what makes the row fill with no hole *and* a short last row land centred instead of
+  stretching. Since v1.5.0 there are seven tiles: at desktop width the rows read lead + one, three,
+  then two, and that last pair sits 185 px from either side (measured at 1440, 2026-10-22). A grid
+  reopens the gap; this is a locked decision (2026-08-30), not a layout preference.
 - **Motion serves meaning only.** Everything is inside
   `@media (prefers-reduced-motion: no-preference)` — on this page that is smooth in-page
   scrolling, and nothing else. With reduced motion on, the page is identical in content: measured
-  both ways, the same 3,710 characters of copy, the same nine pictures, and the same four
+  both ways (v1.5.0, 2026-10-22), the same 3,873 characters of copy, the same twelve pictures
+  (eleven windows and the mark), and the same four
   elements invisible either way (the rail's baseline spacers).
 - **Targets** — every control is at least 24 × 24 CSS px at phone width (WCAG 2.2 AA).
 

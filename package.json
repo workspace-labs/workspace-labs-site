@@ -1,6 +1,6 @@
 {
   "name": "workspace-labs-website",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "description": "The WorkSpace Labs site \u2014 one static page explaining the human-gated build system. No dependencies, no build step, no network calls.",
   "scripts": {
