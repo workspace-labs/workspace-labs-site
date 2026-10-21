@@ -3,6 +3,34 @@
 All notable changes to this project. The version lives in `package.json` at this code root and
 moves once per board card (Rule 27).
 
+## [1.4.0] - 2026-10-22
+
+**The site is ready for Apple Developer enrollment.** Apple looks for a real site on the
+company's own domain, a way to contact the company, and a privacy policy address for each app.
+The footer had no copyright line and no policy, and its contact link showed the Gmail inbox.
+
+- **Contact address** — the footer's third handle is now `hello@workspace-labs.net`, the domain's
+  own address, which forwards to the brand inbox. The Gmail address is no longer shown anywhere.
+- **Copyright line** — `© 2026 WorkSpace Labs` sits on a new line under the handles, with the
+  **Privacy** link at its other end. Same size, colour and underline rule as the handles; no new
+  token, font or colour. The two sentences and three handles above it are untouched.
+- **Privacy policy** — a new page at `privacy/index.html`, so the address is
+  `https://workspace-labs.net/privacy/`. It uses the home page's own tokens, header and footer. It
+  covers who we are and the contact address, what the website collects (nothing: no cookies,
+  analytics, forms or accounts), who else sees anything (GitHub Pages logs visitor IP addresses
+  for security, per GitHub's own documentation), messages sent to us, how to have data deleted,
+  and the date it was last updated. **No app is described yet**: Planvy is left out by the
+  owner's decision, and the page says each app gets its own section before it is released.
+- **Sitemap** — now lists the home page and the policy, both with `lastmod` 2026-10-22.
+  `robots.txt` changed only in a comment that said the site is one page.
+- **Tests** — the three pins that named the Gmail address, or allowed the sitemap one page only,
+  were widened to the new address and the second page. One new pin checks the footer's address,
+  copyright line and Privacy link; that the policy exists, keeps its sections and a real date,
+  carries no TODO and names no AI model; that neither page shows Gmail; and that the policy's
+  tokens, header and footer match the home page. The owner's-name check now reads both pages.
+  12 deliberate breaks in a disposable copy were all caught. `npm test`: 20 of 20 pass.
+- Direct chat authorization, no Backloop card.
+
 ## [1.3.2] - 2026-10-19
 
 - Document the existing colors, font sources and readability pairs in DESIGN.md for the Workspace Palette window, using the owner-approved preview contract. Today's application colors and fonts are unchanged.

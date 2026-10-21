@@ -1,7 +1,8 @@
 # DESIGN.md — the identity this site is locked to
 
-The visual law for this project (Rule 15). It governs **one live page**: `index.html`, the
-WorkSpace Labs site. The site is built from the Workspace app's own **daylight** identity, so the
+The visual law for this project (Rule 15). It governs **two live pages**: `index.html`, the
+WorkSpace Labs site, and `privacy/index.html`, its privacy policy, which carries the home page's
+own tokens, header and footer (a test holds the tokens equal). The site is built from the Workspace app's own **daylight** identity, so the
 site and the app read as one product.
 
 There is no second palette. The dark alternative that once lived in this file belonged to a
@@ -92,7 +93,9 @@ the card is remade from `assets/og-card.source.html` (see `ASSETS.md`), never re
 
 **Footer links** read in `--accent-ink` (4.65:1 on the ground) and go to `--accent-2` on hover and
 on `:focus-visible`, which also **underline** — the site's only underline, and it exists so the
-link is not signalled by colour alone. No new token, no new colour.
+link is not signalled by colour alone. No new token, no new colour. The **Privacy** link on the
+copyright line reads the same way. A link **inside a paragraph** of the privacy policy carries
+its underline at rest, because it sits among `--ink-soft` text and colour cannot be its only cue.
 
 ## Shape, spacing, motion
 

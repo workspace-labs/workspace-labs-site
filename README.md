@@ -1,6 +1,6 @@
 # WorkSpace Labs — the site
 
-**One page.** It explains a human-gated build system: three AI agents plan, build and check each
+**One page, plus its privacy policy.** It explains a human-gated build system: three AI agents plan, build and check each
 other, and every point where something could be lost, changed or shipped is a button only a person
 can press.
 
@@ -29,12 +29,20 @@ That is the site. There is no picker, no chooser, and no second page to compare 
 
 It works with the network switched off: every font and every picture is a relative path on disk.
 
+**The privacy policy is one folder down** (`privacy/index.html`), because its address has to be
+`https://workspace-labs.net/privacy/`. Served over the web, and in Chrome from a double-click, it
+loads the same font and mark as the home page (both measured 2026-10-22). Safari opened from a
+double-click refuses files one folder up (`../assets/`) - found on another of these sites, not
+re-measured on this one - so expect the text there in the system font with no mark. The real
+site is unaffected.
+
 ---
 
 ## What is in here
 
 ```
 index.html          the site — hero, the board, the agents, the rules, the windows
+privacy/index.html  the privacy policy, at /privacy/ — the address Apple is given
 archive/            the three shapes the site was chosen from, kept as the record
 assets/screens/     nine app windows, web-sized
 assets/screens/4k/  the same nine at 4500 x 3000, so any later size is a resize
@@ -46,7 +54,7 @@ assets/og-card.png       the picture a shared link paints (2400 x 1260)
 assets/og-card.source.html   the HTML that card is remade from
 assets/fonts/       Plus Jakarta Sans, bundled locally (SIL OFL 1.1)
 robots.txt          what search engines may read — and the sitemap's address
-sitemap.xml         the one page, for Google Search Console
+sitemap.xml         the two pages, for Google Search Console
 tests/              regression pins, one per defect (`npm test`)
 .backup-pipeline/   pre-edit copies of the text files, kept for rollback — text only, no pictures
 ASSETS.md           where every picture came from, and how to remake it
@@ -65,7 +73,8 @@ governed by `DESIGN.md`.
 **Being found in Google.** `robots.txt` invites crawlers in, names the sitemap, and turns them
 away from `/archive/` — those drafts are live at their own URLs and one is a near-copy of the
 homepage, which would compete with it in a search result. `sitemap.xml` lists the home page and
-nothing else. `index.html` carries a **canonical** line naming `https://workspace-labs.net/`.
+the privacy policy, nothing else. `index.html` carries a **canonical** line naming
+`https://workspace-labs.net/`, and the policy one naming `https://workspace-labs.net/privacy/`.
 
 The canonical is *not* what unifies the site's addresses: `www`, plain `http` and the
 `workspace-labs.github.io/workspace-labs-site/` backup all **301 to the domain already**, which GitHub
@@ -182,7 +191,14 @@ The footer carries **three quiet handles**, under the two sentences that were al
 |---|---|
 | `github.com/workspace-labs` | `https://github.com/workspace-labs` |
 | `@workspacelabs91` | `https://x.com/workspacelabs91` |
-| `workspacelabs91@gmail.com` | `mailto:workspacelabs91@gmail.com` |
+| `hello@workspace-labs.net` | `mailto:hello@workspace-labs.net` |
+
+The third one is the domain's own address; it forwards to the brand inbox, whose Gmail address is
+never shown (v1.4.0). Under the handles sits **`© 2026 WorkSpace Labs`**, with **Privacy** at the
+other end of the line - the one footer link that stays on this site, so it opens in the same tab.
+The policy at `/privacy/` says the website collects nothing, that GitHub Pages logs visitor IP
+addresses for security, how a message to `hello@` is handled, and how to have it deleted. It
+describes no app yet; each app gets its own section there before it is released.
 
 Text only — no GitHub or X marks, and no word-label standing in for a handle. Each opens a new
 tab with `rel="noopener noreferrer"`, so the page it opens gets no handle back on this one. They
@@ -215,7 +231,7 @@ network requests of its own.
 
 **No LinkedIn, and no real name anywhere on the page or one click from it.** The site is
 handle-only by decision: `github.com/workspace-labs`, `@workspacelabs91`, and the brand inbox
-`workspacelabs91@gmail.com`. **Three** regression pins hold that shut — one names the three
+`hello@workspace-labs.net`. **Three** regression pins hold that shut — one names the three
 permitted addresses one at a time, the second refuses any other `@handle` in visible copy and any
 linkedin.com or twitter.com address in the source, and the third refuses **the name itself**.
 

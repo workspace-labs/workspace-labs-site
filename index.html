@@ -213,11 +213,12 @@ footer{border-top:1px solid var(--line);margin-top:clamp(48px,7vw,88px)}
 /* The three handles. They WRAP rather than queue in one row, the same lesson the phone nav
    paid for: at 360 CSS px a single row would push the last address past the right edge. */
 .foot__links{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center}
-.foot__links a{color:var(--accent-ink);text-decoration:none;
+.foot__links a,.foot__line a{color:var(--accent-ink);text-decoration:none;
   display:inline-flex;align-items:center;min-height:24px}
 /* Colour is not the only cue: hover and keyboard focus both underline, so a reader who does not
-   separate #3E5BFF from #4A5478 still sees a link. :focus-visible also draws the page's 3px ring. */
-.foot__links a:hover,.foot__links a:focus-visible{color:var(--accent-2);text-decoration:underline}
+   separate #3E5BFF from #4A5478 still sees a link. :focus-visible also draws the page's 3px ring.
+   The Privacy link on the copyright line reads the same way. */
+.foot__line a:hover,.foot__line a:focus-visible,.foot__links a:hover,.foot__links a:focus-visible{color:var(--accent-2);text-decoration:underline}
 
 @media (max-width:719px){
   html{scroll-padding-top:144px}
@@ -428,8 +429,12 @@ footer{border-top:1px solid var(--line);margin-top:clamp(48px,7vw,88px)}
     <nav class="foot__links" aria-label="WorkSpace Labs elsewhere">
       <a href="https://github.com/workspace-labs" target="_blank" rel="noopener noreferrer">github.com/workspace-labs</a>
       <a href="https://x.com/workspacelabs91" target="_blank" rel="noopener noreferrer">@workspacelabs91</a>
-      <a href="mailto:workspacelabs91@gmail.com" target="_blank" rel="noopener noreferrer">workspacelabs91@gmail.com</a>
+      <a href="mailto:hello@workspace-labs.net" target="_blank" rel="noopener noreferrer">hello@workspace-labs.net</a>
     </nav>
+    <div class="foot__line">
+      <span>© 2026 WorkSpace Labs</span>
+      <a href="privacy/">Privacy</a>
+    </div>
   </div>
 </footer>
 </body>

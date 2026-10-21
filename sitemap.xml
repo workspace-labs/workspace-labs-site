@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- One page, one entry. Google ignores changefreq and priority, so neither is claimed here. -->
+<!-- The home page and its privacy policy. Google ignores changefreq and priority, so neither is claimed here. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://workspace-labs.net/</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-10-22</lastmod>
+  </url>
+  <url>
+    <loc>https://workspace-labs.net/privacy/</loc>
+    <lastmod>2026-10-22</lastmod>
   </url>
 </urlset>

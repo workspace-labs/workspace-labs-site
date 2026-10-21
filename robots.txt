@@ -1,5 +1,5 @@
 # workspace-labs.net — what search engines may read.
-# The site is one page; everything a reader should find is on it.
+# The site is one page and its privacy policy; both are in the sitemap.
 
 # One group, no blank lines inside it: a blank line ends the group for a strict
 # first-match parser, which orphans every rule under it. Disallow stands FIRST for

@@ -16,14 +16,16 @@ const path   = require('node:path');
 const ROOT  = path.join(__dirname, '..');
 const read  = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
 const LIVE  = 'index.html';
+const PRIVACY = 'privacy/index.html';
 
 // The only three addresses this page may point at, in the order he answered them on
 // t-1788110064810 (2026-08-30): GitHub, X, the brand inbox. Written out in full on purpose - a
-// host pattern would quietly admit a second account or a different repo.
+// host pattern would quietly admit a second account or a different repo. Since v1.4.0 the inbox
+// is the domain's own hello@ address; the Gmail behind it is never shown.
 const OUTBOUND = [
   'https://github.com/workspace-labs',
   'https://x.com/workspacelabs91',
-  'mailto:workspacelabs91@gmail.com',
+  'mailto:hello@workspace-labs.net',
 ];
 
 // visible copy = what a reader sees: no comments, no stylesheet, no tag names
@@ -59,18 +61,19 @@ test('the site still opens on a picker instead of the product page', () => {
   assert.doesNotMatch(visible(src), /\bconcept\b|\bdemo\b|\bpicker\b/i,
     'the live page describes itself as a concept or a demo');
 
-  // one page: no ANCHOR on it leads to another FILE. (<link> in the head is a resource, not
-  // navigation.) Since v1.3.0 the footer carries exactly three outbound handles - the ones he
-  // answered on the card - and they are named here one address at a time rather than by a host
-  // pattern, so a fourth link, a different account, or twitter.com still fails this pin.
+  // one page: no ANCHOR on it leads to another FILE, except the privacy policy (v1.4.0). (<link>
+  // in the head is a resource, not navigation.) Since v1.3.0 the footer carries exactly three
+  // outbound handles - the ones he answered on the card - and they are named here one address at
+  // a time rather than by a host pattern, so a fourth link, a different account, or twitter.com
+  // still fails this pin.
   const hrefs = [...src.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)].map(m => m[1]);
   assert.ok(hrefs.length > 0, 'the page must have links');
   for (const h of hrefs) {
-    assert.ok(h.startsWith('#') || OUTBOUND.includes(h),
+    assert.ok(h.startsWith('#') || h === 'privacy/' || OUTBOUND.includes(h),
       `the live page links out to a file: ${h}`);
   }
   // and no outbound address may appear twice or go missing - three links, three destinations
-  const out = hrefs.filter(h => !h.startsWith('#'));
+  const out = hrefs.filter(h => !h.startsWith('#') && h !== 'privacy/');
   assert.deepStrictEqual(out, OUTBOUND, 'the footer must carry exactly the three approved links, in order');
   // and every head resource the BROWSER FETCHES must be a local asset that really exists.
   // rel="canonical" is the one link that is never fetched: it declares which of the page's two
@@ -213,7 +216,7 @@ test("the visible copy breaks the human's version-one content decision", () => {
   // before the ban runs and every OTHER @handle still fails exactly as it did.
   const stripped = text
     .split('@workspacelabs91').join('')
-    .split('workspacelabs91@gmail.com').join('');
+    .split('hello@workspace-labs.net').join('');
   assert.doesNotMatch(stripped, /@[a-z0-9_]{3,}/i, 'a handle appeared in visible copy');
   assert.doesNotMatch(text, /linkedin/i, 'LinkedIn appeared in visible copy');
   // A URL, not the word: naming LinkedIn in a comment about who reads the og tags is honest
@@ -455,15 +458,22 @@ test('the site is invisible to search engines and its two addresses compete for 
 
   const sitemap = read('sitemap.xml');
   const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1].trim());
-  assert.deepStrictEqual(locs, [HOME], `the sitemap must list the home page and nothing else: ${locs}`);
+  assert.deepStrictEqual(locs, [HOME, `${HOME}privacy/`],
+    `the sitemap must list the home page and its privacy policy, and nothing else: ${locs}`);
   assert.match(sitemap, /xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9"/,
     'the sitemap must declare the sitemaps.org namespace or Google rejects the file');
 
-  // A lastmod must be a real calendar date, not a placeholder that says "never touched".
-  const [, mod] = sitemap.match(/<lastmod>([^<]+)<\/lastmod>/) || [];
-  assert.ok(mod, 'the sitemap entry must carry a lastmod');
-  assert.match(mod, /^\d{4}-\d{2}-\d{2}$/, `lastmod must be a plain YYYY-MM-DD date: ${mod}`);
-  assert.ok(!Number.isNaN(Date.parse(mod)), `lastmod is not a real date: ${mod}`);
+  // A lastmod must be a real calendar date, not a placeholder that says "never touched" - on
+  // every entry, not only the first.
+  const mods = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map(m => m[1]);
+  assert.strictEqual(mods.length, locs.length, 'every sitemap entry must carry a lastmod');
+  for (const mod of mods) {
+    assert.match(mod, /^\d{4}-\d{2}-\d{2}$/, `lastmod must be a plain YYYY-MM-DD date: ${mod}`);
+    assert.ok(!Number.isNaN(Date.parse(mod)), `lastmod is not a real date: ${mod}`);
+  }
+  // and the privacy page must name the same address the sitemap does, or the two split again
+  assert.match(read(PRIVACY), new RegExp(`<link rel="canonical" href="${HOME}privacy/">`),
+    'the privacy page must declare the address the sitemap lists');
 
   // 4. Nothing the sitemap invites in may be a page robots.txt turns away.
   for (const l of locs) {
@@ -494,7 +504,7 @@ test('the footer loses a handle, points somewhere else, or hands the tab to the 
   const want = [
     ['https://github.com/workspace-labs', 'github.com/workspace-labs'],
     ['https://x.com/workspacelabs91',     '@workspacelabs91'],
-    ['mailto:workspacelabs91@gmail.com',  'workspacelabs91@gmail.com'],
+    ['mailto:hello@workspace-labs.net',   'hello@workspace-labs.net'],
   ];
   links.forEach((a, i) => {
     const [href, text] = want[i];
@@ -606,14 +616,15 @@ function letterRuns(text) {
 }
 
 test('a future edit could expose the name while the privacy test stays green', () => {
-  const src = read(LIVE);
-
   // The recommendation names visible copy; the whole source is walked with it because an HTML
-  // comment is served to every visitor too, and a name in one is just as published.
-  for (const [where, text] of [['visible copy', visible(src)], ['the page source', src]]) {
-    for (const run of letterRuns(text)) {
-      assert.ok(!NAME_DIGESTS.has(nameHash(run)),
-        `the owner's real name is in ${where} of ${LIVE} - this site is handle-only`);
+  // comment is served to every visitor too, and a name in one is just as published. Both pages.
+  for (const page of [LIVE, PRIVACY]) {
+    const src = read(page);
+    for (const [where, text] of [['visible copy', visible(src)], ['the page source', src]]) {
+      for (const run of letterRuns(text)) {
+        assert.ok(!NAME_DIGESTS.has(nameHash(run)),
+          `the owner's real name is in ${where} of ${page} - this site is handle-only`);
+      }
     }
   }
 
@@ -651,5 +662,63 @@ test('a future edit could expose the name while the privacy test stays green', (
     for (const canary of [C6, C8, C16]) {
       assert.ok(!hits(clean, canary), `the name check fires on "${clean}", which carries no name`);
     }
+  }
+});
+
+// ── what Apple checks before it lets the company publish an app ───────────────
+//
+// Apple Developer enrollment looks for a real site on the company's own domain, a way to contact
+// the company, and a privacy policy address for every app. v1.4.0 put all three in the footer.
+
+test('Apple finds no contact address, no copyright line, or no privacy policy on the site', () => {
+  const live = read(LIVE);
+  const foot = /<footer>[\s\S]*<\/footer>/.exec(live);
+  assert.ok(foot, 'the home page must have a footer');
+
+  // 1. The three things in the footer, each one a reader can see.
+  assert.match(foot[0], /<a href="mailto:hello@workspace-labs\.net"[^>]*>hello@workspace-labs\.net<\/a>/,
+    'the footer must show hello@workspace-labs.net as a mailto link');
+  assert.match(foot[0], /<span>© 2026 WorkSpace Labs<\/span>/, 'the footer must carry © 2026 WorkSpace Labs');
+  assert.match(foot[0], /<a href="privacy\/">Privacy<\/a>/, 'the footer must link to the privacy policy as "Privacy"');
+
+  // 2. The inbox behind hello@ is a Gmail account, and it is never shown - on either page.
+  for (const page of [LIVE, PRIVACY]) {
+    assert.ok(fs.existsSync(path.join(ROOT, page)), `${page} must exist - /privacy/ is the address Apple is given`);
+    assert.doesNotMatch(read(page), /gmail/i, `${page} shows the Gmail inbox behind hello@`);
+  }
+
+  // 3. The policy covers what the task listed, and says when it was last changed.
+  const pol = read(PRIVACY);
+  const text = visible(pol);
+  for (const heading of ['Who we are', 'What this website collects', 'Who else sees anything', 'Deleting your data']) {
+    assert.match(pol, new RegExp(`<h2>${heading}</h2>`), `the privacy policy lost its "${heading}" section`);
+  }
+  assert.match(pol, /<a href="mailto:hello@workspace-labs\.net">/, 'the policy must give the contact address');
+  const [, updated] = pol.match(/Last updated: <time datetime="(\d{4}-\d{2}-\d{2})">/) || [];
+  assert.ok(updated && !Number.isNaN(Date.parse(updated)), 'the policy must carry a real "Last updated" date');
+  assert.doesNotMatch(pol, /\bTODO\b/, 'an unanswered TODO would be published on the privacy policy');
+  // No AI model or vendor is named in the new text (the task's rule).
+  assert.doesNotMatch(text + foot[0],
+    /\b(Claude|Anthropic|Codex|OpenAI|ChatGPT|GPT|Grok|Gemini|Kimi|Devin|Llama|Opus|Sonnet)\b/,
+    'the privacy policy or the footer names an AI model');
+
+  // 4. Same look as the home page: the same tokens, the same header, the same footer - only the
+  //    paths differ, because the policy lives one folder down.
+  const block = (src, re) => (re.exec(src) || [])[0];
+  assert.strictEqual(block(pol, /:root\{[^}]*\}/), block(live, /:root\{[^}]*\}/),
+    'the privacy page tokens drifted from the home page');
+  const hdr = src => block(src, /<header class="hdr">[\s\S]*?<\/header>/);
+  assert.strictEqual(hdr(pol), hdr(live)
+    .replace('href="#top"', 'href="../"').split('href="#').join('href="../#').split('src="assets/').join('src="../assets/'),
+    'the privacy page header is not the home page header');
+  assert.strictEqual(block(pol, /<footer>[\s\S]*<\/footer>/).replace('<a href="./" aria-current="page">', '<a href="privacy/">'),
+    foot[0], 'the privacy page footer is not the home page footer');
+
+  // 5. Every local file the policy loads is really there, one folder up.
+  const refs = [...pol.matchAll(/(?:src|href)="(\.\.\/[^"#]+)"|url\('(\.\.\/[^']+)'\)/g)].map(m => m[1] || m[2]);
+  assert.ok(refs.some(r => r.includes('fonts/')) && refs.some(r => r.includes('logo-mark')),
+    'the privacy page must load the bundled font and the mark');
+  for (const r of refs) {
+    assert.ok(fs.existsSync(path.join(ROOT, 'privacy', r)), `${r} is referenced by the privacy page but not on disk`);
   }
 });

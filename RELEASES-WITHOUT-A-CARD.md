@@ -1,1 +1,2 @@
 - 1.3.2 - 2026-10-19 - Document the existing palette, font sources and readability pairs in DESIGN.md for the Workspace Palette window (direct chat authorization).
+- 1.4.0 - 2026-10-22 - Apple Developer readiness: hello@ contact address, © line and a privacy policy page at /privacy/ (TASK-apple-readiness.md; direct chat authorization, no Backloop card).
