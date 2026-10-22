@@ -8,7 +8,9 @@ moves once per board card (Rule 27).
 - **Removed `TASK-apple-readiness.md` from the site root.** It was the task list for 1.4.0, and
   because this folder is the published site it was served at a public URL — with the owner's
   first name in it, against the site's handle-only rule. The work it described is done and
-  recorded under 1.4.0. The file remains in this repository's history.
+  recorded under 1.4.0. On the owner's go the file was then removed from this repository's
+  history as well (rewritten and force-pushed 2026-10-22; a verified bundle of the old history is
+  kept outside the repo, in the catalog's `.backup-pipeline/`).
 - Owner's go, no Backloop card.
 
 ## [1.5.0] - 2026-10-22
